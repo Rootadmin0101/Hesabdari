@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>دفتر فروش</title>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('برنامه آفلاین فعال شد!'))
+      .catch(err => console.log('خطا در فعال‌سازی حالت آفلاین:', err));
+  }
+</script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Tahoma, Arial, sans-serif; background: #f0f4f8; direction: rtl; min-height: 100vh; }
@@ -118,7 +126,6 @@
     font-family: Tahoma, Arial, sans-serif;
   }
 
-  /* Add form - 3 inputs */
   .add-form {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: white; border-top: 2px solid #1a5276;
@@ -304,74 +311,167 @@ function confirmClear(){ document.getElementById('modalOverlay').classList.add('
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
 function doClear(){ records=[]; save(); closeModal(); render(); }
 
-function exportDayPDF(date, rows){
-  var [dm,dd]=date.split('/');
-  var monthName=monthNamesDari[Number(dm)-1];
-  var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
-  var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
+function buildPdfFromCanvas(canvas, pageWidthPt, pageHeightPt){
+  var dataUrl=canvas.toDataURL('image/jpeg',0.92);
+  var base64=dataUrl.split(',')[1];
+  var binStr=atob(base64);
+  var len=binStr.length;
+  var jpegBytes=new Uint8Array(len);
+  for(var i=0;i<len;i++) jpegBytes[i]=binStr.charCodeAt(i);
 
-  var rowsHtml=rows.map((r,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td class="name">${r.name||'—'}</td>
-      <td>${Number(r.price).toLocaleString('en')}</td>
-      <td>${Number(r.profit).toLocaleString('en')}</td>
-    </tr>
-  `).join('');
+  var parts=[]; var offset=0; var offsets=[0];
+  function pushStr(s){ var b=new TextEncoder().encode(s); parts.push(b); offset+=b.length; }
+  function pushBytes(b){ parts.push(b); offset+=b.length; }
 
-  var win=window.open('','_blank');
-  if(!win){ alert('مرورگر پاپ‌آپ را مسدود کرده.'); return; }
-  win.document.write(`
-    <!DOCTYPE html>
-    <html dir="rtl" lang="fa">
-    <head>
-      <meta charset="UTF-8">
-      <title>فروش ${dm}/${dd}</title>
-      <style>
-        body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; color: #111; }
-        h2 { text-align: center; color: #1a5276; margin-bottom: 4px; }
-        p.sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 16px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: #1a5276; color: white; padding: 8px; text-align: center; }
-        th.name { text-align: right; }
-        td { padding: 7px; text-align: center; border-bottom: 1px solid #ddd; }
-        td.name { text-align: right; }
-        tr:nth-child(even) td { background: #f0f8ff; }
-        .total-row td { background: #d6eaf8; font-weight: bold; }
-        .footer { margin-top: 20px; display: flex; gap: 20px; justify-content: center; }
-        .fcard { border: 2px solid #1a5276; border-radius: 8px; padding: 10px 20px; text-align: center; }
-        .fcard .fl { font-size: 12px; color: #555; }
-        .fcard .fv { font-size: 20px; font-weight: bold; color: #1a5276; }
-        .fcard.profit .fv { color: #1e8449; }
-        @media print { button { display: none; } }
-      </style>
-    </head>
-    <body>
-      <h2>📒 دفتر فروش روزانه</h2>
-      <p class="sub">تاریخ: ${dm} ${monthName} - روز ${dd}</p>
-      <table>
-        <thead><tr><th>#</th><th class="name">اسم جنس</th><th>قیمت</th><th>سود</th></tr></thead>
-        <tbody>${rowsHtml}</tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td colspan="2" style="text-align:right;padding-right:10px">جمع کل</td>
-            <td>${dayP.toLocaleString('en')}</td>
-            <td>${dayS.toLocaleString('en')}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <div class="footer">
-        <div class="fcard"><div class="fl">مجموع قیمت</div><div class="fv">${dayP.toLocaleString('en')}</div></div>
-        <div class="fcard profit"><div class="fl">مجموع سود</div><div class="fv">${dayS.toLocaleString('en')}</div></div>
-      </div>
-      <br>
-      <div style="text-align:center">
-        <button onclick="window.print()" style="background:#1a5276;color:white;border:none;padding:10px 30px;border-radius:8px;font-size:15px;cursor:pointer">🖨️ پرینت / ذخیره PDF</button>
-      </div>
-    </body></html>
-  `);
-  win.document.close();
-  setTimeout(()=>win.print(),500);
+  pushStr('%PDF-1.4\n');
+  offsets[1]=offset;
+  pushStr('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  offsets[2]=offset;
+  pushStr('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+  offsets[3]=offset;
+  pushStr('3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /XObject << /Im0 5 0 R >> >> /MediaBox [0 0 '+pageWidthPt+' '+pageHeightPt+'] /Contents 4 0 R >>\nendobj\n');
+  var cs='q '+pageWidthPt+' 0 0 '+pageHeightPt+' 0 0 cm /Im0 Do Q';
+  offsets[4]=offset;
+  pushStr('4 0 obj\n<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream\nendobj\n');
+  offsets[5]=offset;
+  pushStr('5 0 obj\n<< /Type /XObject /Subtype /Image /Width '+canvas.width+' /Height '+canvas.height+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+jpegBytes.length+' >>\nstream\n');
+  pushBytes(jpegBytes);
+  pushStr('\nendstream\nendobj\n');
+
+  var xrefStart=offset;
+  var xref='xref\n0 6\n0000000000 65535 f \n';
+  for(var n=1;n<=5;n++){ xref+=String(offsets[n]).padStart(10,'0')+' 00000 n \n'; }
+  pushStr(xref);
+  pushStr('trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n'+xrefStart+'\n%%EOF');
+
+  var total=parts.reduce(function(s,p){return s+p.length;},0);
+  var out=new Uint8Array(total); var pos=0;
+  parts.forEach(function(p){ out.set(p,pos); pos+=p.length; });
+  return new Blob([out],{type:'application/pdf'});
+}
+
+function downloadBlob(blob, filename){
+  // گرفتن تاییدیه و اسم دلخواه از کاربر قبل از دانلود در موبایل
+  var userFileName = prompt("لطفاً نام فایل PDF را به دلخواه وارد کنید:", filename);
+  if (userFileName === null) return; // اگر انصراف داد
+  if (userFileName.trim() === "") { userFileName = filename; }
+  if (!userFileName.endsWith(".pdf")) { userFileName += ".pdf"; }
+
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download=userFileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},2000);
+}
+
+function exportDayPDF(btn, date, rows){
+  if(btn){ btn.disabled=true; var oldTxt=btn.textContent; btn.textContent='⏳'; }
+  try{
+    var sp=date.split('/'); var dm=sp[0], dd=sp[1];
+    var monthName=monthNamesDari[Number(dm)-1];
+    var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
+    var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
+
+    var scale=2;
+    var pageWpt=595, marginPt=28, rowHpt=26, headerHpt=58, theadHpt=28, footerHpt=70;
+    var contentHpt=headerHpt+theadHpt+rows.length*rowHpt+footerHpt+marginPt*2;
+    var pageHpt=Math.max(contentHpt,260);
+
+    var canvas=document.createElement('canvas');
+    canvas.width=Math.round(pageWpt*scale);
+    canvas.height=Math.round(pageHpt*scale);
+    var ctx=canvas.getContext('2d');
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.scale(scale,scale);
+    ctx.textBaseline='middle';
+
+    var x0=marginPt, x1=pageWpt-marginPt;
+    var y=marginPt;
+
+    ctx.fillStyle='#1a5276';
+    ctx.font='bold 18px Tahoma, Arial, sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('دفتر فروش روزانه', pageWpt/2, y+10);
+    y+=24;
+    ctx.fillStyle='#666';
+    ctx.font='12px Tahoma, Arial, sans-serif';
+    ctx.fillText('تاریخ: '+dm+' '+monthName+' - روز '+dd, pageWpt/2, y+8);
+    y+=28;
+
+    var numW=28, priceW=85, profitW=85;
+    var nameW=(x1-x0)-numW-priceW-profitW;
+    var cols=[
+      {key:'num', w:numW, align:'center'},
+      {key:'name', w:nameW, align:'right'},
+      {key:'price', w:priceW, align:'center'},
+      {key:'profit', w:profitW, align:'center'}
+    ];
+    var right=x1;
+    cols.forEach(function(c){ c.right=right; c.left=right-c.w; right=c.left; });
+
+    ctx.fillStyle='#1a5276';
+    ctx.fillRect(x0,y,x1-x0,theadHpt);
+    ctx.fillStyle='#ffffff';
+    ctx.font='bold 12px Tahoma, Arial, sans-serif';
+    var labels={num:'#',name:'اسم جنس',price:'قیمت',profit:'سود'};
+    cols.forEach(function(c){
+      ctx.textAlign=c.align==='right'?'right':'center';
+      var tx=c.align==='right'?c.right-6:(c.left+c.right)/2;
+      ctx.fillText(labels[c.key], tx, y+theadHpt/2);
+    });
+    y+=theadHpt;
+
+    ctx.font='12px Tahoma, Arial, sans-serif';
+    rows.forEach(function(r,i){
+      if(i%2===1){ ctx.fillStyle='#f0f8ff'; ctx.fillRect(x0,y,x1-x0,rowHpt); }
+      ctx.strokeStyle='#ddd'; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.moveTo(x0,y+rowHpt); ctx.lineTo(x1,y+rowHpt); ctx.stroke();
+      ctx.fillStyle='#222';
+      var vals={num:String(i+1), name:r.name||'—', price:Number(r.price||0).toLocaleString('en'), profit:Number(r.profit||0).toLocaleString('en')};
+      cols.forEach(function(c){
+        ctx.textAlign=c.align==='right'?'right':'center';
+        var tx=c.align==='right'?c.right-6:(c.left+c.right)/2;
+        ctx.fillText(vals[c.key], tx, y+rowHpt/2);
+      });
+      y+=rowHpt;
+    });
+
+    ctx.fillStyle='#d6eaf8';
+    ctx.fillRect(x0,y,x1-x0,rowHpt);
+    ctx.fillStyle='#1a3a5c';
+    ctx.font='bold 12px Tahoma, Arial, sans-serif';
+    ctx.textAlign='right'; ctx.fillText('جمع کل', cols[1].right-6, y+rowHpt/2);
+    ctx.textAlign='center';
+    ctx.fillText(dayP.toLocaleString('en'), (cols[2].left+cols[2].right)/2, y+rowHpt/2);
+    ctx.fillText(dayS.toLocaleString('en'), (cols[3].left+cols[3].right)/2, y+rowHpt/2);
+    y+=rowHpt+24;
+
+    var cardW=(x1-x0-16)/2;
+    ctx.strokeStyle='#1a5276'; ctx.lineWidth=1.5;
+    ctx.strokeRect(x0,y,cardW,46);
+    ctx.fillStyle='#555'; ctx.font='11px Tahoma, Arial, sans-serif'; ctx.textAlign='center';
+    ctx.fillText('مجموع قیمت', x0+cardW/2, y+15);
+    ctx.fillStyle='#1a5276'; ctx.font='bold 16px Tahoma, Arial, sans-serif';
+    ctx.fillText(dayP.toLocaleString('en'), x0+cardW/2, y+33);
+
+    var x2=x0+cardW+16;
+    ctx.strokeStyle='#1e8449';
+    ctx.strokeRect(x2,y,cardW,46);
+    ctx.fillStyle='#555'; ctx.font='11px Tahoma, Arial, sans-serif';
+    ctx.fillText('مجموع سود', x2+cardW/2, y+15);
+    ctx.fillStyle='#1e8449'; ctx.font='bold 16px Tahoma, Arial, sans-serif';
+    ctx.fillText(dayS.toLocaleString('en'), x2+cardW/2, y+33);
+
+    var blob=buildPdfFromCanvas(canvas, pageWpt, pageHpt);
+    downloadBlob(blob, 'forosh_'+dm+'_'+dd);
+  }catch(err){
+    console.error(err);
+    alert('خطا در ساخت PDF: '+(err&&err.message?err.message:err));
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent=oldTxt; }
+  }
 }
 
 function render(){
@@ -407,7 +507,7 @@ function render(){
         <span>📅 ${toFa(dm)} ${mName} / ${toFa(dd)}</span>
         <div class="hdr-btns">
           <span class="day-totals">ق: ${formatNum(dayP)} | س: ${formatNum(dayS)}</span>
-          <button class="pdf-btn" onclick="exportDayPDF('${date}', window._groups['${date}'])">📄 PDF</button>
+          <button class="pdf-btn" onclick="exportDayPDF(this, '${date}', window._groups['${date}'])">📄 PDF</button>
         </div>
       </div>
       <table>
