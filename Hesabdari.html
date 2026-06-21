@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>دفتر فروش</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Tahoma, Arial, sans-serif; background: #f0f4f8; direction: rtl; min-height: 100vh; }
+
+  header {
+    background: #1a5276; color: white;
+    padding: 12px 16px 8px; text-align: center;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  header h1 { font-size: 17px; }
+  header p { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+
+  .date-bar {
+    background: #fff; padding: 9px 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 2px solid #d5e8f5;
+    position: sticky; top: 56px; z-index: 90; flex-wrap: wrap;
+  }
+  .date-bar label { font-size: 13px; color: #555; white-space: nowrap; }
+  .date-selects { display: flex; gap: 6px; align-items: center; }
+  .date-selects select {
+    border: 1px solid #bcd; border-radius: 6px;
+    padding: 5px 6px; font-size: 14px;
+    font-family: Tahoma, Arial, sans-serif;
+    background: #f7fbff; color: #1a3a5c;
+  }
+  .date-label {
+    background: #1a5276; color: white;
+    border-radius: 8px; padding: 4px 10px;
+    font-size: 13px; font-weight: bold;
+    min-width: 80px; text-align: center;
+  }
+
+  .summary {
+    display: flex; gap: 8px;
+    padding: 10px 12px; background: #eaf2f8;
+  }
+  .card {
+    flex: 1; background: white; border-radius: 10px;
+    padding: 8px 10px; text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .card .label { font-size: 11px; color: #888; margin-bottom: 3px; }
+  .card .value { font-size: 15px; font-weight: bold; }
+  .card.price .value { color: #1a5276; }
+  .card.profit .value { color: #1e8449; }
+
+  .table-wrap { padding: 0 8px 90px; }
+
+  .day-block {
+    margin-top: 12px; background: white;
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+  }
+  .day-header {
+    background: #1a5276; color: white;
+    padding: 7px 12px; font-size: 13px; font-weight: bold;
+    display: flex; justify-content: space-between; align-items: center; gap: 6px;
+  }
+  .day-header .day-totals { font-size: 11px; opacity: 0.85; }
+  .day-header .hdr-btns { display: flex; gap: 5px; align-items: center; }
+
+  .pdf-btn {
+    background: #e8f5e9; color: #1e8449;
+    border: 1px solid #a5d6a7; border-radius: 6px;
+    padding: 3px 8px; font-size: 11px; cursor: pointer;
+    white-space: nowrap;
+  }
+  .pdf-btn:active { background: #c8e6c9; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: #d6eaf8; color: #1a3a5c;
+    padding: 7px 4px; text-align: center;
+    font-size: 12px; border-bottom: 1px solid #acd;
+  }
+  thead th.name-col { text-align: right; padding-right: 8px; }
+  tbody td {
+    padding: 7px 4px; text-align: center;
+    border-bottom: 1px solid #f0f0f0; color: #333;
+  }
+  tbody td.name-cell { text-align: right; padding-right: 8px; font-size: 13px; color: #222; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f9f9f9; }
+  .profit-cell { color: #1e8449; font-weight: bold; }
+  .price-cell { color: #1a5276; }
+
+  .del-btn {
+    background: none; border: none; color: #c0392b;
+    cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px;
+  }
+
+  tfoot td {
+    padding: 6px 4px; background: #eaf2f8;
+    font-weight: bold; text-align: center;
+  }
+
+  .grand-total {
+    margin: 14px 8px; background: #1a5276; color: white;
+    border-radius: 12px; padding: 12px 16px;
+    display: flex; justify-content: space-around; text-align: center;
+  }
+  .gt-item .gt-label { font-size: 11px; opacity: 0.8; }
+  .gt-item .gt-val { font-size: 19px; font-weight: bold; margin-top: 2px; }
+
+  .clear-section { margin: 0 8px 10px; text-align: center; }
+  .clear-btn {
+    background: #fff; color: #c0392b;
+    border: 1.5px solid #e74c3c; border-radius: 8px;
+    padding: 8px 22px; font-size: 13px; cursor: pointer;
+    font-family: Tahoma, Arial, sans-serif;
+  }
+
+  /* Add form - 3 inputs */
+  .add-form {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 2px solid #1a5276;
+    padding: 8px 10px; display: flex; gap: 6px;
+    align-items: center; z-index: 200;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+  }
+  .add-form input {
+    flex: 1; border: 1px solid #bcd; border-radius: 8px;
+    padding: 9px 6px; font-size: 14px;
+    font-family: Tahoma, Arial, sans-serif;
+    text-align: center; background: #f7fbff; min-width: 0;
+  }
+  .add-form input#inName { flex: 1.6; text-align: right; padding-right: 8px; }
+  .add-form input::placeholder { font-size: 11px; color: #aaa; }
+  .add-btn {
+    background: #1a5276; color: white; border: none;
+    border-radius: 8px; padding: 9px 14px;
+    font-size: 20px; cursor: pointer; flex-shrink: 0;
+  }
+  .add-btn:active { background: #154360; }
+
+  .empty-msg { text-align: center; color: #aaa; padding: 30px; font-size: 14px; }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 500;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 14px;
+    padding: 24px 20px; margin: 20px;
+    max-width: 340px; width: 100%; text-align: center;
+  }
+  .modal h3 { color: #c0392b; margin-bottom: 10px; font-size: 16px; }
+  .modal p { color: #555; font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
+  .modal-btns { display: flex; gap: 10px; justify-content: center; }
+  .modal-btns button {
+    flex: 1; padding: 10px; border-radius: 8px;
+    border: none; font-size: 14px; cursor: pointer;
+    font-family: Tahoma, Arial, sans-serif;
+  }
+  .btn-confirm { background: #c0392b; color: white; }
+  .btn-cancel { background: #eee; color: #333; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📒 دفتر فروش</h1>
+  <p>حسابداری روزانه</p>
+</header>
+
+<div class="date-bar">
+  <label>تاریخ:</label>
+  <div class="date-selects">
+    <select id="selMonth" onchange="updateCurrentDate()"></select>
+    <span style="color:#555">/</span>
+    <select id="selDay" onchange="updateCurrentDate()"></select>
+  </div>
+  <div class="date-label" id="dateLabel"></div>
+</div>
+
+<div class="summary">
+  <div class="card price">
+    <div class="label">قیمت امروز</div>
+    <div class="value" id="todayPrice">۰</div>
+  </div>
+  <div class="card profit">
+    <div class="label">سود امروز</div>
+    <div class="value" id="todayProfit">۰</div>
+  </div>
+</div>
+
+<div class="table-wrap" id="tableWrap"></div>
+
+<div class="grand-total">
+  <div class="gt-item">
+    <div class="gt-label">مجموع کل قیمت</div>
+    <div class="gt-val" id="totalPrice">۰</div>
+  </div>
+  <div class="gt-item">
+    <div class="gt-label">مجموع کل سود</div>
+    <div class="gt-val" id="totalProfit">۰</div>
+  </div>
+</div>
+
+<div class="clear-section">
+  <button class="clear-btn" onclick="confirmClear()">🗑️ پاک‌سازی همه تاریخچه</button>
+</div>
+
+<div class="add-form">
+  <input type="text" id="inName" placeholder="اسم جنس">
+  <input type="number" id="inPrice" placeholder="قیمت" inputmode="numeric">
+  <input type="number" id="inProfit" placeholder="سود" inputmode="numeric">
+  <button class="add-btn" onclick="addRow()">+</button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>⚠️ پاک‌سازی تاریخچه</h3>
+    <p>آیا مطمئن هستی؟<br>تمام اطلاعات فروش پاک می‌شود و قابل بازیابی نیست.</p>
+    <div class="modal-btns">
+      <button class="btn-confirm" onclick="doClear()">بله، پاک کن</button>
+      <button class="btn-cancel" onclick="closeModal()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const monthNamesDari = ['حمل','ثور','جوزا','سرطان','اسد','سنبله','میزان','عقرب','قوس','جدی','دلو','حوت'];
+
+function toFa(n){ return String(n).replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]); }
+function formatNum(n){ return toFa(Number(n).toLocaleString('en')); }
+
+function toJalali(gy,gm,gd){
+  var g_d_no,j_d_no,j_np,i;
+  var g_y=gy-1600,g_m=gm-1,g_d=gd-1;
+  g_d_no=365*g_y+Math.floor((g_y+3)/4)-Math.floor((g_y+99)/100)+Math.floor((g_y+399)/400);
+  for(i=0;i<g_m;i++) g_d_no+=[31,((g_y%4==0&&g_y%100!=0)||(g_y%400==0))?29:28,31,30,31,30,31,31,30,31,30,31][i];
+  g_d_no+=g_d;
+  j_d_no=g_d_no-79;
+  j_np=Math.floor(j_d_no/12053);j_d_no%=12053;
+  var jy=979+33*j_np+4*Math.floor(j_d_no/1461);
+  j_d_no%=1461;
+  if(j_d_no>=366){jy+=Math.floor((j_d_no-1)/365);j_d_no=(j_d_no-1)%365;}
+  for(i=0;i<11&&j_d_no>=(i<6?31:30);i++) j_d_no-=(i<6?31:30);
+  return [jy,i+1,j_d_no+1];
+}
+function todayJalali(){ var d=new Date(); return toJalali(d.getFullYear(),d.getMonth()+1,d.getDate()); }
+
+var records = JSON.parse(localStorage.getItem('hesab_v3') || '[]');
+var currentDate = '';
+function save(){ localStorage.setItem('hesab_v3', JSON.stringify(records)); }
+
+function initSelectors(){
+  var selM=document.getElementById('selMonth');
+  var selD=document.getElementById('selDay');
+  for(var m=1;m<=12;m++){
+    var o=document.createElement('option');
+    o.value=m; o.text=m+' - '+monthNamesDari[m-1];
+    selM.appendChild(o);
+  }
+  for(var d=1;d<=31;d++){
+    var o2=document.createElement('option');
+    o2.value=d; o2.text=d;
+    selD.appendChild(o2);
+  }
+  var jd=todayJalali();
+  selM.value=jd[1]; selD.value=jd[2];
+  updateCurrentDate();
+}
+
+function updateCurrentDate(){
+  var m=document.getElementById('selMonth').value;
+  var d=document.getElementById('selDay').value;
+  currentDate=m+'/'+d;
+  document.getElementById('dateLabel').textContent=toFa(m)+' '+monthNamesDari[m-1]+' / '+toFa(d);
+  render();
+}
+
+function addRow(){
+  var n=document.getElementById('inName').value.trim();
+  var p=document.getElementById('inPrice').value.trim();
+  var s=document.getElementById('inProfit').value.trim();
+  if(!n&&!p&&!s) return;
+  records.push({date:currentDate, name:n||'—', price:p||'0', profit:s||'0', id:Date.now()});
+  save();
+  document.getElementById('inName').value='';
+  document.getElementById('inPrice').value='';
+  document.getElementById('inProfit').value='';
+  document.getElementById('inName').focus();
+  render();
+}
+
+function deleteRow(id){
+  records=records.filter(r=>r.id!==id);
+  save(); render();
+}
+
+function confirmClear(){ document.getElementById('modalOverlay').classList.add('show'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+function doClear(){ records=[]; save(); closeModal(); render(); }
+
+function exportDayPDF(date, rows){
+  var [dm,dd]=date.split('/');
+  var monthName=monthNamesDari[Number(dm)-1];
+  var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
+  var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
+
+  var rowsHtml=rows.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td class="name">${r.name||'—'}</td>
+      <td>${Number(r.price).toLocaleString('en')}</td>
+      <td>${Number(r.profit).toLocaleString('en')}</td>
+    </tr>
+  `).join('');
+
+  var win=window.open('','_blank');
+  if(!win){ alert('مرورگر پاپ‌آپ را مسدود کرده.'); return; }
+  win.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl" lang="fa">
+    <head>
+      <meta charset="UTF-8">
+      <title>فروش ${dm}/${dd}</title>
+      <style>
+        body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; color: #111; }
+        h2 { text-align: center; color: #1a5276; margin-bottom: 4px; }
+        p.sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: #1a5276; color: white; padding: 8px; text-align: center; }
+        th.name { text-align: right; }
+        td { padding: 7px; text-align: center; border-bottom: 1px solid #ddd; }
+        td.name { text-align: right; }
+        tr:nth-child(even) td { background: #f0f8ff; }
+        .total-row td { background: #d6eaf8; font-weight: bold; }
+        .footer { margin-top: 20px; display: flex; gap: 20px; justify-content: center; }
+        .fcard { border: 2px solid #1a5276; border-radius: 8px; padding: 10px 20px; text-align: center; }
+        .fcard .fl { font-size: 12px; color: #555; }
+        .fcard .fv { font-size: 20px; font-weight: bold; color: #1a5276; }
+        .fcard.profit .fv { color: #1e8449; }
+        @media print { button { display: none; } }
+      </style>
+    </head>
+    <body>
+      <h2>📒 دفتر فروش روزانه</h2>
+      <p class="sub">تاریخ: ${dm} ${monthName} - روز ${dd}</p>
+      <table>
+        <thead><tr><th>#</th><th class="name">اسم جنس</th><th>قیمت</th><th>سود</th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="2" style="text-align:right;padding-right:10px">جمع کل</td>
+            <td>${dayP.toLocaleString('en')}</td>
+            <td>${dayS.toLocaleString('en')}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">
+        <div class="fcard"><div class="fl">مجموع قیمت</div><div class="fv">${dayP.toLocaleString('en')}</div></div>
+        <div class="fcard profit"><div class="fl">مجموع سود</div><div class="fv">${dayS.toLocaleString('en')}</div></div>
+      </div>
+      <br>
+      <div style="text-align:center">
+        <button onclick="window.print()" style="background:#1a5276;color:white;border:none;padding:10px 30px;border-radius:8px;font-size:15px;cursor:pointer">🖨️ پرینت / ذخیره PDF</button>
+      </div>
+    </body></html>
+  `);
+  win.document.close();
+  setTimeout(()=>win.print(),500);
+}
+
+function render(){
+  var groups={}, order=[];
+  records.forEach(function(r){
+    if(!groups[r.date]){ groups[r.date]=[]; order.push(r.date); }
+    groups[r.date].push(r);
+  });
+  order=[...new Set(order)];
+  order.sort(function(a,b){
+    var [am,ad]=a.split('/').map(Number);
+    var [bm,bd]=b.split('/').map(Number);
+    return am!==bm?am-bm:ad-bd;
+  });
+
+  var wrap=document.getElementById('tableWrap');
+  wrap.innerHTML='';
+  var totalP=0,totalS=0;
+
+  order.forEach(function(date){
+    var rows=groups[date];
+    var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
+    var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
+    totalP+=dayP; totalS+=dayS;
+
+    var [dm,dd]=date.split('/');
+    var mName=monthNamesDari[Number(dm)-1];
+
+    var block=document.createElement('div');
+    block.className='day-block';
+    block.innerHTML=`
+      <div class="day-header">
+        <span>📅 ${toFa(dm)} ${mName} / ${toFa(dd)}</span>
+        <div class="hdr-btns">
+          <span class="day-totals">ق: ${formatNum(dayP)} | س: ${formatNum(dayS)}</span>
+          <button class="pdf-btn" onclick="exportDayPDF('${date}', window._groups['${date}'])">📄 PDF</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th class="name-col">اسم جنس</th>
+            <th>قیمت</th>
+            <th>سود</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody_${date.replace('/','_')}"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2" style="text-align:right;padding-right:8px;color:#555;font-size:12px">جمع</td>
+            <td class="price-cell">${formatNum(dayP)}</td>
+            <td class="profit-cell">${formatNum(dayS)}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+    wrap.appendChild(block);
+
+    var tbody=document.getElementById('tbody_'+date.replace('/','_'));
+    rows.forEach(function(r,i){
+      var tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td style="color:#aaa;font-size:11px">${toFa(i+1)}</td>
+        <td class="name-cell">${r.name||'—'}</td>
+        <td class="price-cell">${formatNum(r.price)}</td>
+        <td class="profit-cell">${formatNum(r.profit)}</td>
+        <td><button class="del-btn" onclick="deleteRow(${r.id})">🗑</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+
+  window._groups=groups;
+
+  if(order.length===0){
+    wrap.innerHTML='<div class="empty-msg">هنوز رکوردی ثبت نشده<br>اولین فروش امروز را وارد کنید ✍️</div>';
+  }
+
+  var todayRows=groups[currentDate]||[];
+  var tp=todayRows.reduce((s,r)=>s+Number(r.price||0),0);
+  var ts=todayRows.reduce((s,r)=>s+Number(r.profit||0),0);
+  document.getElementById('todayPrice').textContent=formatNum(tp);
+  document.getElementById('todayProfit').textContent=formatNum(ts);
+  document.getElementById('totalPrice').textContent=formatNum(totalP);
+  document.getElementById('totalProfit').textContent=formatNum(totalS);
+}
+
+document.addEventListener('keydown',function(e){ if(e.key==='Enter') addRow(); });
+initSelectors();
+</script>
+</body>
+</html>
