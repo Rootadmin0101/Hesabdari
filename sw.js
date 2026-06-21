@@ -1,6 +1,6 @@
 const CACHE_NAME = 'hesab-v3-cache';
 const ASSETS = [
-  './index-1.html',
+  './index.html',
   './manifest.json'
 ];
 
