@@ -3,7 +3,7 @@
   "name": "نرم افزار حسابداری دفتر فروش",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2942/2942250.png",
+      "src": "./icon.png",
       "type": "image/png",
       "sizes": "512x512"
     }
