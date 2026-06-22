@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hesab-v3-cache';
+const CACHE_NAME = 'hesab-v5-cache';
 const ASSETS = [
   './index.html',
   './manifest.json'
