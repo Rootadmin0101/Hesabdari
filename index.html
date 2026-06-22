@@ -2,184 +2,94 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>دفتر فروش</title>
-<link rel="manifest" href="manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('برنامه آفلاین فعال شد!'))
-      .catch(err => console.log('خطا در فعال‌سازی حالت آفلاین:', err));
-  }
-</script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Tahoma, Arial, sans-serif; background: #f0f4f8; direction: rtl; min-height: 100vh; }
-
-  header {
-    background: #1a5276; color: white;
-    padding: 12px 16px 8px; text-align: center;
-    position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  }
-  header h1 { font-size: 17px; }
-  header p { font-size: 11px; opacity: 0.75; margin-top: 2px; }
-
-  .date-bar {
-    background: #fff; padding: 9px 12px;
-    display: flex; align-items: center; gap: 8px;
-    border-bottom: 2px solid #d5e8f5;
-    position: sticky; top: 56px; z-index: 90; flex-wrap: wrap;
-  }
-  .date-bar label { font-size: 13px; color: #555; white-space: nowrap; }
-  .date-selects { display: flex; gap: 6px; align-items: center; }
-  .date-selects select {
-    border: 1px solid #bcd; border-radius: 6px;
-    padding: 5px 6px; font-size: 14px;
-    font-family: Tahoma, Arial, sans-serif;
-    background: #f7fbff; color: #1a3a5c;
-  }
-  .date-label {
-    background: #1a5276; color: white;
-    border-radius: 8px; padding: 4px 10px;
-    font-size: 13px; font-weight: bold;
-    min-width: 80px; text-align: center;
-  }
-
-  .summary {
-    display: flex; gap: 8px;
-    padding: 10px 12px; background: #eaf2f8;
-  }
-  .card {
-    flex: 1; background: white; border-radius: 10px;
-    padding: 8px 10px; text-align: center;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  }
-  .card .label { font-size: 11px; color: #888; margin-bottom: 3px; }
-  .card .value { font-size: 15px; font-weight: bold; }
-  .card.price .value { color: #1a5276; }
-  .card.profit .value { color: #1e8449; }
-
-  .table-wrap { padding: 0 8px 90px; }
-
-  .day-block {
-    margin-top: 12px; background: white;
-    border-radius: 12px; overflow: hidden;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
-  }
-  .day-header {
-    background: #1a5276; color: white;
-    padding: 7px 12px; font-size: 13px; font-weight: bold;
-    display: flex; justify-content: space-between; align-items: center; gap: 6px;
-  }
-  .day-header .day-totals { font-size: 11px; opacity: 0.85; }
-  .day-header .hdr-btns { display: flex; gap: 5px; align-items: center; }
-
-  .pdf-btn {
-    background: #e8f5e9; color: #1e8449;
-    border: 1px solid #a5d6a7; border-radius: 6px;
-    padding: 3px 8px; font-size: 11px; cursor: pointer;
-    white-space: nowrap;
-  }
-  .pdf-btn:active { background: #c8e6c9; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th {
-    background: #d6eaf8; color: #1a3a5c;
-    padding: 7px 4px; text-align: center;
-    font-size: 12px; border-bottom: 1px solid #acd;
-  }
-  thead th.name-col { text-align: right; padding-right: 8px; }
-  tbody td {
-    padding: 7px 4px; text-align: center;
-    border-bottom: 1px solid #f0f0f0; color: #333;
-  }
-  tbody td.name-cell { text-align: right; padding-right: 8px; font-size: 13px; color: #222; }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #f9f9f9; }
-  .profit-cell { color: #1e8449; font-weight: bold; }
-  .price-cell { color: #1a5276; }
-
-  .del-btn {
-    background: none; border: none; color: #c0392b;
-    cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px;
-  }
-
-  tfoot td {
-    padding: 6px 4px; background: #eaf2f8;
-    font-weight: bold; text-align: center;
-  }
-
-  .grand-total {
-    margin: 14px 8px; background: #1a5276; color: white;
-    border-radius: 12px; padding: 12px 16px;
-    display: flex; justify-content: space-around; text-align: center;
-  }
-  .gt-item .gt-label { font-size: 11px; opacity: 0.8; }
-  .gt-item .gt-val { font-size: 19px; font-weight: bold; margin-top: 2px; }
-
-  .clear-section { margin: 0 8px 10px; text-align: center; }
-  .clear-btn {
-    background: #fff; color: #c0392b;
-    border: 1.5px solid #e74c3c; border-radius: 8px;
-    padding: 8px 22px; font-size: 13px; cursor: pointer;
-    font-family: Tahoma, Arial, sans-serif;
-  }
-
-  .add-form {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: white; border-top: 2px solid #1a5276;
-    padding: 8px 10px; display: flex; gap: 6px;
-    align-items: center; z-index: 200;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-  }
-  .add-form input {
-    flex: 1; border: 1px solid #bcd; border-radius: 8px;
-    padding: 9px 6px; font-size: 14px;
-    font-family: Tahoma, Arial, sans-serif;
-    text-align: center; background: #f7fbff; min-width: 0;
-  }
-  .add-form input#inName { flex: 1.6; text-align: right; padding-right: 8px; }
-  .add-form input::placeholder { font-size: 11px; color: #aaa; }
-  .add-btn {
-    background: #1a5276; color: white; border: none;
-    border-radius: 8px; padding: 9px 14px;
-    font-size: 20px; cursor: pointer; flex-shrink: 0;
-  }
-  .add-btn:active { background: #154360; }
-
-  .empty-msg { text-align: center; color: #aaa; padding: 30px; font-size: 14px; }
-
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.5); z-index: 500;
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal {
-    background: white; border-radius: 14px;
-    padding: 24px 20px; margin: 20px;
-    max-width: 340px; width: 100%; text-align: center;
-  }
-  .modal h3 { color: #c0392b; margin-bottom: 10px; font-size: 16px; }
-  .modal p { color: #555; font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
-  .modal-btns { display: flex; gap: 10px; justify-content: center; }
-  .modal-btns button {
-    flex: 1; padding: 10px; border-radius: 8px;
-    border: none; font-size: 14px; cursor: pointer;
-    font-family: Tahoma, Arial, sans-serif;
-  }
-  .btn-confirm { background: #c0392b; color: white; }
-  .btn-cancel { background: #eee; color: #333; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Tahoma,Arial,sans-serif;background:#f0f4f8;direction:rtl;min-height:100vh;}
+header{background:#1a5276;color:white;padding:12px 16px 8px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+header h1{font-size:17px;}
+header p{font-size:11px;opacity:.75;margin-top:2px;}
+#todayDateHeader{margin-top:5px;font-size:12px;opacity:.88;letter-spacing:.3px;}
+.date-bar{background:#fff;padding:9px 12px;display:flex;align-items:center;gap:8px;border-bottom:2px solid #d5e8f5;position:sticky;top:70px;z-index:90;flex-wrap:wrap;}
+.date-bar label{font-size:13px;color:#555;white-space:nowrap;}
+.date-selects{display:flex;gap:6px;align-items:center;}
+.date-selects select{border:1px solid #bcd;border-radius:6px;padding:5px 6px;font-size:14px;font-family:Tahoma,Arial,sans-serif;background:#f7fbff;color:#1a3a5c;}
+.date-label{background:#1a5276;color:white;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:bold;min-width:80px;text-align:center;}
+.summary{display:flex;gap:8px;padding:10px 12px;background:#eaf2f8;}
+.card{flex:1;background:white;border-radius:10px;padding:8px 10px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.card .label{font-size:11px;color:#888;margin-bottom:3px;}
+.card .value{font-size:15px;font-weight:bold;}
+.card.price .value{color:#1a5276;}
+.card.profit .value{color:#1e8449;}
+.table-wrap{padding:0 8px 100px;}
+.month-block{margin-top:16px;}
+.month-header{background:#154360;color:white;border-radius:10px 10px 0 0;padding:8px 14px;font-size:13px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;}
+.month-header .mh-btns{display:flex;gap:6px;align-items:center;}
+.month-pdf-btn{background:#e8f5e9;color:#1e8449;border:1px solid #a5d6a7;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;white-space:nowrap;}
+.month-pdf-btn:active{background:#c8e6c9;}
+.month-summary{background:#1a5276;color:white;padding:5px 14px;font-size:11px;display:flex;gap:16px;opacity:.9;}
+.day-block{background:white;border-bottom:1px solid #e8f0f8;}
+.day-block:last-child{border-radius:0 0 10px 10px;border-bottom:none;box-shadow:0 2px 5px rgba(0,0,0,.08);}
+.day-header{background:#2e86c1;color:white;padding:6px 12px;font-size:12px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.day-totals{font-size:11px;opacity:.85;}
+.hdr-btns{display:flex;gap:5px;align-items:center;}
+.pdf-btn{background:#e8f5e9;color:#1e8449;border:1px solid #a5d6a7;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;white-space:nowrap;}
+.pdf-btn:active{background:#c8e6c9;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:#d6eaf8;color:#1a3a5c;padding:7px 4px;text-align:center;font-size:12px;border-bottom:1px solid #acd;}
+thead th.name-col{text-align:right;padding-right:8px;}
+tbody td{padding:7px 4px;text-align:center;border-bottom:1px solid #f0f0f0;color:#333;}
+tbody td.name-cell{text-align:right;padding-right:8px;font-size:13px;color:#222;}
+tbody tr:last-child td{border-bottom:none;}
+.profit-cell{color:#1e8449;font-weight:bold;}
+.price-cell{color:#1a5276;}
+.del-btn{background:none;border:none;color:#1a5276;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;}
+tfoot td{padding:6px 4px;background:#eaf2f8;font-weight:bold;text-align:center;}
+.grand-total{margin:14px 8px;background:#1a5276;color:white;border-radius:12px;padding:12px 16px;display:flex;justify-content:space-around;text-align:center;}
+.gt-item .gt-label{font-size:11px;opacity:.8;}
+.gt-item .gt-val{font-size:19px;font-weight:bold;margin-top:2px;}
+.bottom-btns{margin:0 8px 10px;display:flex;gap:8px;}
+.backup-btn{flex:1;background:#fff;color:#1a5276;border:1.5px solid #1a5276;border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
+.restore-btn{flex:1;background:#fff;color:#7d6608;border:1.5px solid #d4ac0d;border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
+.add-form{position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #1a5276;padding:8px 10px;display:flex;gap:6px;align-items:center;z-index:200;box-shadow:0 -2px 10px rgba(0,0,0,.15);}
+.add-form input{flex:1;border:1px solid #bcd;border-radius:8px;padding:9px 6px;font-size:14px;font-family:Tahoma,Arial,sans-serif;text-align:center;background:#f7fbff;min-width:0;}
+.add-form input#inName{flex:1.6;text-align:right;padding-right:8px;}
+.add-form input::placeholder{font-size:11px;color:#aaa;}
+.add-btn{background:#1a5276;color:white;border:none;border-radius:8px;padding:9px 14px;font-size:20px;cursor:pointer;flex-shrink:0;}
+.add-btn:active{background:#154360;}
+.empty-msg{text-align:center;color:#aaa;padding:30px;font-size:14px;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:white;border-radius:14px;padding:20px;margin:16px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal h3{color:#1a5276;margin-bottom:12px;font-size:16px;text-align:center;}
+.modal-btns{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.modal-btns button{flex:1;min-width:80px;padding:10px 6px;border-radius:8px;border:none;font-size:13px;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
+.btn-pdf{background:#1a5276;color:white;}
+.btn-jpg{background:#6c3483;color:white;}
+.btn-share{background:#1e8449;color:white;}
+.btn-cancel{background:#eee;color:#333;}
+.btn-backup{background:#1a5276;color:white;}
+.btn-restore2{background:#d4ac0d;color:#333;}
+.btn-danger{background:#c0392b;color:white;}
+#previewCanvas{width:100%;border-radius:8px;border:1px solid #ddd;margin:10px 0;display:block;}
+.filename-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.filename-row label{font-size:12px;color:#555;}
+.filename-row input{border:1px solid #bcd;border-radius:8px;padding:8px 10px;font-size:13px;font-family:Tahoma,Arial,sans-serif;width:100%;}
+#backupModal p{font-size:13px;color:#555;line-height:1.7;margin-bottom:8px;text-align:center;}
+/* EDIT MODAL */
+.edit-field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.edit-field label{font-size:12px;color:#555;}
+.edit-field input{border:1px solid #bcd;border-radius:8px;padding:8px 10px;font-size:14px;font-family:Tahoma,Arial,sans-serif;width:100%;}
 </style>
 </head>
 <body>
-
 <header>
   <h1>📒 دفتر فروش</h1>
   <p>حسابداری روزانه</p>
+  <div id="todayDateHeader"></div>
 </header>
-
 <div class="date-bar">
   <label>تاریخ:</label>
   <div class="date-selects">
@@ -189,35 +99,19 @@
   </div>
   <div class="date-label" id="dateLabel"></div>
 </div>
-
 <div class="summary">
-  <div class="card price">
-    <div class="label">قیمت امروز</div>
-    <div class="value" id="todayPrice">۰</div>
-  </div>
-  <div class="card profit">
-    <div class="label">سود امروز</div>
-    <div class="value" id="todayProfit">۰</div>
-  </div>
+  <div class="card price"><div class="label">قیمت روز انتخابی</div><div class="value" id="todayPrice">۰</div></div>
+  <div class="card profit"><div class="label">سود روز انتخابی</div><div class="value" id="todayProfit">۰</div></div>
 </div>
-
 <div class="table-wrap" id="tableWrap"></div>
-
 <div class="grand-total">
-  <div class="gt-item">
-    <div class="gt-label">مجموع کل قیمت</div>
-    <div class="gt-val" id="totalPrice">۰</div>
-  </div>
-  <div class="gt-item">
-    <div class="gt-label">مجموع کل سود</div>
-    <div class="gt-val" id="totalProfit">۰</div>
-  </div>
+  <div class="gt-item"><div class="gt-label">مجموع کل قیمت</div><div class="gt-val" id="totalPrice">۰</div></div>
+  <div class="gt-item"><div class="gt-label">مجموع کل سود</div><div class="gt-val" id="totalProfit">۰</div></div>
 </div>
-
-<div class="clear-section">
-  <button class="clear-btn" onclick="confirmClear()">🗑️ پاک‌سازی همه تاریخچه</button>
+<div class="bottom-btns">
+  <button class="backup-btn" onclick="openBackupModal()">💾 بک‌آپ</button>
+  <button class="restore-btn" onclick="triggerRestore()">📂 بازیابی</button>
 </div>
-
 <div class="add-form">
   <input type="text" id="inName" placeholder="اسم جنس">
   <input type="number" id="inPrice" placeholder="قیمت" inputmode="numeric">
@@ -225,75 +119,146 @@
   <button class="add-btn" onclick="addRow()">+</button>
 </div>
 
-<div class="modal-overlay" id="modalOverlay">
+<div class="modal-overlay" id="previewModal">
   <div class="modal">
-    <h3>⚠️ پاک‌سازی تاریخچه</h3>
-    <p>آیا مطمئن هستی؟<br>تمام اطلاعات فروش پاک می‌شود و قابل بازیابی نیست.</p>
+    <h3 id="previewTitle">📄 پیش‌نمایش و ذخیره</h3>
+    <canvas id="previewCanvas"></canvas>
+    <div class="filename-row">
+      <label>نام فایل:</label>
+      <input type="text" id="filenameInput" placeholder="نام فایل">
+    </div>
     <div class="modal-btns">
-      <button class="btn-confirm" onclick="doClear()">بله، پاک کن</button>
-      <button class="btn-cancel" onclick="closeModal()">انصراف</button>
+      <button class="btn-pdf" onclick="doSavePDF()">📄 PDF</button>
+      <button class="btn-jpg" onclick="doSaveJPG()">🖼 JPG</button>
+      <button class="btn-share" onclick="doShare()">📤 اشتراک</button>
+      <button class="btn-cancel" onclick="closePreview()">✖ بستن</button>
     </div>
   </div>
 </div>
 
-<script>
-const monthNamesDari = ['حمل','ثور','جوزا','سرطان','اسد','سنبله','میزان','عقرب','قوس','جدی','دلو','حوت'];
+<div class="modal-overlay" id="backupModal">
+  <div class="modal">
+    <h3>💾 بک‌آپ / بازیابی</h3>
+    <p>برای جلوگیری از از دست رفتن اطلاعات،<br>همیشه بک‌آپ بگیرید.</p>
+    <div class="modal-btns">
+      <button class="btn-backup" onclick="doBackup()">💾 ذخیره بک‌آپ</button>
+      <button class="btn-restore2" onclick="triggerRestore()">📂 بازیابی</button>
+      <button class="btn-danger" onclick="confirmClearAll()">🗑 پاک کردن همه</button>
+      <button class="btn-cancel" onclick="closeBackup()">انصراف</button>
+    </div>
+  </div>
+</div>
 
-function toFa(n){ return String(n).replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]); }
-function formatNum(n){ return toFa(Number(n).toLocaleString('en')); }
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3>✏️ ویرایش ردیف</h3>
+    <div class="edit-field"><label>اسم جنس:</label><input type="text" id="editName"></div>
+    <div class="edit-field"><label>قیمت:</label><input type="number" id="editPrice" inputmode="numeric"></div>
+    <div class="edit-field"><label>سود:</label><input type="number" id="editProfit" inputmode="numeric"></div>
+    <div class="modal-btns">
+      <button class="btn-pdf" onclick="saveEdit()">✅ ذخیره</button>
+      <button class="btn-cancel" onclick="closeEdit()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="rowActionsModal">
+  <div class="modal">
+    <h3 id="rowActionsTitle">عملیات</h3>
+    <p id="rowActionsDesc" style="text-align:center;color:#555;font-size:13px;margin:6px 0 14px;"></p>
+    <div class="modal-btns">
+      <button class="btn-pdf" id="rowEditBtn">✏️ ویرایش</button>
+      <button class="btn-danger" id="rowDeleteBtn">🗑 حذف</button>
+      <button class="btn-cancel" onclick="closeRowActions()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 id="confirmTitle">⚠️ تأیید</h3>
+    <p id="confirmMsg" style="text-align:center;color:#555;font-size:13px;margin:10px 0;line-height:1.7;"></p>
+    <div class="modal-btns">
+      <button class="btn-danger" id="confirmOkBtn">بله</button>
+      <button class="btn-cancel" onclick="closeConfirm()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="restoreInput" accept=".json" style="display:none" onchange="doRestore(this)">
+
+<script>
+// ── CONSTANTS ──
+const MN=['حمل','ثور','جوزا','سرطان','اسد','سنبله','میزان','عقرب','قوس','جدی','دلو','حوت'];
+const DN=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'];
+
+// ── HELPERS ──
+function toFa(n){return String(n).replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]); }
+function fmtN(n){return toFa(Number(n).toLocaleString('en'));}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function toOrdFa(n){
+  var w=['','یکم','دوم','سوم','چهارم','پنجم','ششم','هفتم','هشتم','نهم','دهم',
+    'یازدهم','دوازدهم','سیزدهم','چهاردهم','پانزدهم','شانزدهم','هفدهم','هجدهم','نوزدهم','بیستم',
+    'بیست‌ویکم','بیست‌ودوم','بیست‌وسوم','بیست‌وچهارم','بیست‌وپنجم','بیست‌وششم','بیست‌وهفتم','بیست‌وهشتم','بیست‌ونهم','سی‌ام','سی‌ویکم'];
+  return w[n]||toFa(n);
+}
 
 function toJalali(gy,gm,gd){
-  var g_d_no,j_d_no,j_np,i;
-  var g_y=gy-1600,g_m=gm-1,g_d=gd-1;
-  g_d_no=365*g_y+Math.floor((g_y+3)/4)-Math.floor((g_y+99)/100)+Math.floor((g_y+399)/400);
-  for(i=0;i<g_m;i++) g_d_no+=[31,((g_y%4==0&&g_y%100!=0)||(g_y%400==0))?29:28,31,30,31,30,31,31,30,31,30,31][i];
-  g_d_no+=g_d;
-  j_d_no=g_d_no-79;
-  j_np=Math.floor(j_d_no/12053);j_d_no%=12053;
-  var jy=979+33*j_np+4*Math.floor(j_d_no/1461);
-  j_d_no%=1461;
-  if(j_d_no>=366){jy+=Math.floor((j_d_no-1)/365);j_d_no=(j_d_no-1)%365;}
-  for(i=0;i<11&&j_d_no>=(i<6?31:30);i++) j_d_no-=(i<6?31:30);
-  return [jy,i+1,j_d_no+1];
+  var g_y=gy-1600,g_m=gm-1,g_d=gd-1,i,gdn,jdn,jnp;
+  gdn=365*g_y+Math.floor((g_y+3)/4)-Math.floor((g_y+99)/100)+Math.floor((g_y+399)/400);
+  for(i=0;i<g_m;i++)gdn+=[31,((g_y%4==0&&g_y%100!=0)||(g_y%400==0))?29:28,31,30,31,30,31,31,30,31,30,31][i];
+  gdn+=g_d;jdn=gdn-79;jnp=Math.floor(jdn/12053);jdn%=12053;
+  var jy=979+33*jnp+4*Math.floor(jdn/1461);jdn%=1461;
+  if(jdn>=366){jy+=Math.floor((jdn-1)/365);jdn=(jdn-1)%365;}
+  for(i=0;i<11&&jdn>=(i<6?31:30);i++)jdn-=(i<6?31:30);
+  return[jy,i+1,jdn+1];
 }
-function todayJalali(){ var d=new Date(); return toJalali(d.getFullYear(),d.getMonth()+1,d.getDate()); }
+function todayJ(){var d=new Date();return toJalali(d.getFullYear(),d.getMonth()+1,d.getDate());}
 
-var records = JSON.parse(localStorage.getItem('hesab_v3') || '[]');
-var currentDate = '';
-function save(){ localStorage.setItem('hesab_v3', JSON.stringify(records)); }
+function jalaliToDays(y,m,d){
+  var md=[0,31,31,31,31,31,31,30,30,30,30,30,29],days=(y-1)*365+Math.floor((y-1)/4);
+  for(var i=1;i<m;i++)days+=md[i];
+  return days+d;
+}
+function jalaliWeekDay(jy,jm,jd){
+  var now=new Date(),tj=toJalali(now.getFullYear(),now.getMonth()+1,now.getDate());
+  var diff=jalaliToDays(jy,jm,jd)-jalaliToDays(tj[0],tj[1],tj[2]);
+  return DN[(now.getDay()+((diff%7)+7))%7];
+}
 
+// ── STATE ──
+var records=JSON.parse(localStorage.getItem('hesab_v5')||'[]');
+var currentDate='';
+var currentYear=1404;
+function save(){localStorage.setItem('hesab_v5',JSON.stringify(records));}
+
+// ── INIT ──
 function initSelectors(){
-  var selM=document.getElementById('selMonth');
-  var selD=document.getElementById('selDay');
-  for(var m=1;m<=12;m++){
-    var o=document.createElement('option');
-    o.value=m; o.text=m+' - '+monthNamesDari[m-1];
-    selM.appendChild(o);
-  }
-  for(var d=1;d<=31;d++){
-    var o2=document.createElement('option');
-    o2.value=d; o2.text=d;
-    selD.appendChild(o2);
-  }
-  var jd=todayJalali();
-  selM.value=jd[1]; selD.value=jd[2];
+  var sM=document.getElementById('selMonth'),sD=document.getElementById('selDay');
+  for(var m=1;m<=12;m++){var o=document.createElement('option');o.value=m;o.text=m+' - '+MN[m-1];sM.appendChild(o);}
+  for(var d=1;d<=31;d++){var o2=document.createElement('option');o2.value=d;o2.text=d;sD.appendChild(o2);}
+  var jd=todayJ();sM.value=jd[1];sD.value=jd[2];currentYear=jd[0];
+  document.getElementById('todayDateHeader').textContent=
+    '📅 '+DN[new Date().getDay()]+' '+toOrdFa(jd[2])+' '+MN[jd[1]-1]+' '+toFa(jd[0]);
   updateCurrentDate();
 }
 
 function updateCurrentDate(){
-  var m=document.getElementById('selMonth').value;
-  var d=document.getElementById('selDay').value;
+  var m=Number(document.getElementById('selMonth').value);
+  var d=Number(document.getElementById('selDay').value);
   currentDate=m+'/'+d;
-  document.getElementById('dateLabel').textContent=toFa(m)+' '+monthNamesDari[m-1]+' / '+toFa(d);
+  document.getElementById('dateLabel').textContent=
+    jalaliWeekDay(currentYear,m,d)+' '+toOrdFa(d)+' '+MN[m-1];
   render();
 }
 
+// ── ADD ROW ──
 function addRow(){
   var n=document.getElementById('inName').value.trim();
   var p=document.getElementById('inPrice').value.trim();
   var s=document.getElementById('inProfit').value.trim();
-  if(!n&&!p&&!s) return;
-  records.push({date:currentDate, name:n||'—', price:p||'0', profit:s||'0', id:Date.now()});
+  if(!n&&!p&&!s)return;
+  records.push({date:currentDate,name:n||'—',price:p||'0',profit:s||'0',id:Date.now()});
   save();
   document.getElementById('inName').value='';
   document.getElementById('inPrice').value='';
@@ -303,266 +268,444 @@ function addRow(){
 }
 
 function deleteRow(id){
-  records=records.filter(r=>r.id!==id);
-  save(); render();
+  showConfirm('حذف ردیف','آیا این ردیف حذف شود؟',function(){
+    records=records.filter(r=>r.id!==id);save();render();
+  });
 }
 
-function confirmClear(){ document.getElementById('modalOverlay').classList.add('show'); }
-function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
-function doClear(){ records=[]; save(); closeModal(); render(); }
+// ── EDIT ──
+var _editId=null;
+function openEdit(id){
+  var r=records.find(x=>x.id===id);if(!r)return;
+  _editId=id;
+  document.getElementById('editName').value=r.name==='—'?'':r.name;
+  document.getElementById('editPrice').value=r.price;
+  document.getElementById('editProfit').value=r.profit;
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEdit(){document.getElementById('editModal').classList.remove('show');_editId=null;}
+function saveEdit(){
+  var r=records.find(x=>x.id===_editId);if(!r)return;
+  var n=document.getElementById('editName').value.trim();
+  r.name=n||'—';
+  r.price=document.getElementById('editPrice').value||'0';
+  r.profit=document.getElementById('editProfit').value||'0';
+  save();closeEdit();render();
+}
 
-function buildPdfFromCanvas(canvas, pageWidthPt, pageHeightPt){
-  var dataUrl=canvas.toDataURL('image/jpeg',0.92);
-  var base64=dataUrl.split(',')[1];
-  var binStr=atob(base64);
-  var len=binStr.length;
-  var jpegBytes=new Uint8Array(len);
-  for(var i=0;i<len;i++) jpegBytes[i]=binStr.charCodeAt(i);
+// ── CONFIRM MODAL ──
+var _confirmCb=null;
+function showConfirm(title,msg,cb){
+  document.getElementById('confirmTitle').textContent='⚠️ '+title;
+  document.getElementById('confirmMsg').textContent=msg;
+  _confirmCb=cb;
+  document.getElementById('confirmModal').classList.add('show');
+}
+function closeConfirm(){document.getElementById('confirmModal').classList.remove('show');_confirmCb=null;}
+document.getElementById('confirmOkBtn').onclick=function(){if(_confirmCb)_confirmCb();closeConfirm();};
 
-  var parts=[]; var offset=0; var offsets=[0];
-  function pushStr(s){ var b=new TextEncoder().encode(s); parts.push(b); offset+=b.length; }
-  function pushBytes(b){ parts.push(b); offset+=b.length; }
+function confirmClearAll(){
+  closeBackup();
+  showConfirm('پاک کردن همه','تمام اطلاعات فروش پاک می‌شود و قابل بازیابی نیست. مطمئنی؟',function(){
+    records=[];save();render();
+  });
+}
 
-  pushStr('%PDF-1.4\n');
-  offsets[1]=offset;
-  pushStr('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
-  offsets[2]=offset;
-  pushStr('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
-  offsets[3]=offset;
-  pushStr('3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /XObject << /Im0 5 0 R >> >> /MediaBox [0 0 '+pageWidthPt+' '+pageHeightPt+'] /Contents 4 0 R >>\nendobj\n');
-  var cs='q '+pageWidthPt+' 0 0 '+pageHeightPt+' 0 0 cm /Im0 Do Q';
-  offsets[4]=offset;
-  pushStr('4 0 obj\n<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream\nendobj\n');
-  offsets[5]=offset;
-  pushStr('5 0 obj\n<< /Type /XObject /Subtype /Image /Width '+canvas.width+' /Height '+canvas.height+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+jpegBytes.length+' >>\nstream\n');
-  pushBytes(jpegBytes);
-  pushStr('\nendstream\nendobj\n');
+// ── BACKUP / RESTORE ──
+function openBackupModal(){document.getElementById('backupModal').classList.add('show');}
+function closeBackup(){document.getElementById('backupModal').classList.remove('show');}
+function doBackup(){
+  var blob=new Blob([JSON.stringify({v:5,records:records},null,2)],{type:'application/json'});
+  var jd=todayJ();
+  downloadBlobAs(blob,'backup_'+jd[0]+'_'+MN[jd[1]-1]+'_'+jd[2]+'.json');
+  closeBackup();
+}
+function triggerRestore(){closeBackup();document.getElementById('restoreInput').value='';document.getElementById('restoreInput').click();}
+function doRestore(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var parsed=JSON.parse(e.target.result);
+      var arr=parsed.records||parsed;
+      if(!Array.isArray(arr))throw new Error('invalid');
+      showConfirm('بازیابی','اطلاعات فعلی با بک‌آپ جایگزین می‌شود ('+arr.length+' رکورد). ادامه؟',function(){
+        records=arr;save();render();
+        alert('✅ بازیابی موفق! '+arr.length+' رکورد بازیابی شد.');
+      });
+    }catch(e){alert('❌ خطا: فایل بک‌آپ معتبر نیست.');}
+  };
+  reader.readAsText(file);
+}
 
-  var xrefStart=offset;
-  var xref='xref\n0 6\n0000000000 65535 f \n';
-  for(var n=1;n<=5;n++){ xref+=String(offsets[n]).padStart(10,'0')+' 00000 n \n'; }
-  pushStr(xref);
-  pushStr('trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n'+xrefStart+'\n%%EOF');
+// ── CANVAS: روزانه ──
+function buildDayCanvas(date,rows){
+  var sp=date.split('/'),dm=Number(sp[0]),dd=Number(sp[1]);
+  var mName=MN[dm-1];
+  var wdName=jalaliWeekDay(currentYear,dm,dd);
+  var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
+  var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
+  var sc=2,pw=595,mg=28,rh=28,hh=96,th=30,fh=90;
+  var ph=Math.max(hh+th+rows.length*rh+fh+mg,320);
+  var cv=document.createElement('canvas');
+  cv.width=pw*sc;cv.height=ph*sc;
+  var ctx=cv.getContext('2d');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.scale(sc,sc);ctx.textBaseline='middle';
+  var x0=mg,x1=pw-mg;
+  // هدر
+  ctx.fillStyle='#1a5276';ctx.fillRect(0,0,pw,hh);
+  ctx.fillStyle='#fff';ctx.font='bold 17px Tahoma,Arial,sans-serif';ctx.textAlign='center';
+  ctx.fillText('دفتر فروش روزانه',pw/2,22);
+  ctx.font='bold 14px Tahoma,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.95)';
+  ctx.fillText(wdName+' '+toOrdFa(dd)+' '+mName+' '+toFa(currentYear),pw/2,46);
+  ctx.font='11px Tahoma,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.6)';
+  ctx.fillText('گزارش فروش روزانه',pw/2,68);
+  var y=hh+14;
+  // ستون‌ها
+  var nW=26,pW=95,sW=95,nmW=(x1-x0)-nW-pW-sW;
+  var cols=[{k:'num',w:nW,a:'center'},{k:'name',w:nmW,a:'right'},{k:'price',w:pW,a:'center'},{k:'profit',w:sW,a:'center'}];
+  var rt=x1;cols.forEach(c=>{c.r=rt;c.l=rt-c.w;rt=c.l;});
+  // thead
+  ctx.fillStyle='#2e86c1';ctx.fillRect(x0,y,x1-x0,th);
+  ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma,Arial,sans-serif';
+  var lb={num:'#',name:'اسم جنس',price:'قیمت',profit:'سود'};
+  cols.forEach(c=>{ctx.textAlign=c.a==='right'?'right':'center';ctx.fillText(lb[c.k],c.a==='right'?c.r-6:(c.l+c.r)/2,y+th/2);});
+  y+=th;
+  // ردیف‌ها
+  ctx.font='12px Tahoma,Arial,sans-serif';
+  rows.forEach((r,i)=>{
+    if(i%2===1){ctx.fillStyle='#f0f8ff';ctx.fillRect(x0,y,x1-x0,rh);}
+    ctx.strokeStyle='#e0e8f0';ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(x0,y+rh);ctx.lineTo(x1,y+rh);ctx.stroke();
+    var vs={num:String(i+1),name:r.name||'—',price:Number(r.price||0).toLocaleString('en'),profit:Number(r.profit||0).toLocaleString('en')};
+    cols.forEach(c=>{
+      ctx.fillStyle=c.k==='profit'?'#1e8449':c.k==='price'?'#1a5276':'#222';
+      ctx.textAlign=c.a==='right'?'right':'center';
+      ctx.fillText(vs[c.k],c.a==='right'?c.r-6:(c.l+c.r)/2,y+rh/2);
+    });y+=rh;
+  });
+  // جمع
+  ctx.fillStyle='#d6eaf8';ctx.fillRect(x0,y,x1-x0,rh);
+  ctx.font='bold 12px Tahoma,Arial,sans-serif';
+  ctx.fillStyle='#1a3a5c';ctx.textAlign='right';ctx.fillText('جمع کل',cols[1].r-6,y+rh/2);
+  ctx.textAlign='center';
+  ctx.fillStyle='#1a5276';ctx.fillText(dayP.toLocaleString('en'),(cols[2].l+cols[2].r)/2,y+rh/2);
+  ctx.fillStyle='#1e8449';ctx.fillText(dayS.toLocaleString('en'),(cols[3].l+cols[3].r)/2,y+rh/2);
+  y+=rh+18;
+  // کارت‌ها
+  var cw=(x1-x0-16)/2;
+  ctx.strokeStyle='#1a5276';ctx.lineWidth=1.5;ctx.strokeRect(x0,y,cw,46);
+  ctx.fillStyle='#666';ctx.font='11px Tahoma,Arial,sans-serif';ctx.textAlign='center';
+  ctx.fillText('مجموع قیمت',x0+cw/2,y+14);
+  ctx.fillStyle='#1a5276';ctx.font='bold 15px Tahoma,Arial,sans-serif';ctx.fillText(dayP.toLocaleString('en'),x0+cw/2,y+33);
+  var x2=x0+cw+16;
+  ctx.strokeStyle='#1e8449';ctx.strokeRect(x2,y,cw,46);
+  ctx.fillStyle='#666';ctx.font='11px Tahoma,Arial,sans-serif';ctx.fillText('مجموع سود',x2+cw/2,y+14);
+  ctx.fillStyle='#1e8449';ctx.font='bold 15px Tahoma,Arial,sans-serif';ctx.fillText(dayS.toLocaleString('en'),x2+cw/2,y+33);
+  return cv;
+}
 
-  var total=parts.reduce(function(s,p){return s+p.length;},0);
-  var out=new Uint8Array(total); var pos=0;
-  parts.forEach(function(p){ out.set(p,pos); pos+=p.length; });
+// ── CANVAS: ماهانه ──
+function buildMonthCanvas(mon,datesInMonth,groups){
+  var mName=MN[Number(mon)-1];
+  var allRows=[];
+  datesInMonth.forEach(date=>groups[date].forEach(r=>allRows.push({...r,_date:date})));
+  var monP=allRows.reduce((s,r)=>s+Number(r.price||0),0);
+  var monS=allRows.reduce((s,r)=>s+Number(r.profit||0),0);
+  var sc=2,pw=595,mg=28,rh=26,hh=96,th=30,fh=110;
+  var ph=Math.max(hh+th+allRows.length*rh+fh+mg*3,380);
+  var cv=document.createElement('canvas');
+  cv.width=pw*sc;cv.height=ph*sc;
+  var ctx=cv.getContext('2d');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.scale(sc,sc);ctx.textBaseline='middle';
+  var x0=mg,x1=pw-mg;
+  // هدر
+  ctx.fillStyle='#154360';ctx.fillRect(0,0,pw,hh);
+  ctx.fillStyle='#fff';ctx.font='bold 17px Tahoma,Arial,sans-serif';ctx.textAlign='center';
+  ctx.fillText('گزارش ماهانه فروش',pw/2,22);
+  ctx.font='bold 15px Tahoma,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.95)';
+  ctx.fillText('ماه '+mName+' - '+toFa(currentYear),pw/2,46);
+  ctx.font='11px Tahoma,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.6)';
+  ctx.fillText(datesInMonth.length+' روز کاری | '+allRows.length+' قلم فروش',pw/2,70);
+  var y=hh+14;
+  // ستون‌ها (اضافه: روز)
+  var dW=55,nW=24,pW=85,sW=85,nmW=(x1-x0)-dW-nW-pW-sW;
+  var cols=[{k:'day',w:dW,a:'center'},{k:'num',w:nW,a:'center'},{k:'name',w:nmW,a:'right'},{k:'price',w:pW,a:'center'},{k:'profit',w:sW,a:'center'}];
+  var rt=x1;cols.forEach(c=>{c.r=rt;c.l=rt-c.w;rt=c.l;});
+  // thead
+  ctx.fillStyle='#1a5276';ctx.fillRect(x0,y,x1-x0,th);
+  ctx.fillStyle='#fff';ctx.font='bold 11px Tahoma,Arial,sans-serif';
+  var lb={day:'روز',num:'#',name:'اسم جنس',price:'قیمت',profit:'سود'};
+  cols.forEach(c=>{ctx.textAlign=c.a==='right'?'right':'center';ctx.fillText(lb[c.k],c.a==='right'?c.r-5:(c.l+c.r)/2,y+th/2);});
+  y+=th;
+  // ردیف‌ها با گروه‌بندی روز
+  ctx.font='11px Tahoma,Arial,sans-serif';
+  var prevDate='',rowIdx=0;
+  allRows.forEach((r,i)=>{
+    var dd=r._date.split('/')[1];
+    var isNewDay=r._date!==prevDate;
+    if(isNewDay){
+      rowIdx=0;prevDate=r._date;
+      // خط جداکننده روز
+      if(i>0){ctx.strokeStyle='#b0c4d8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();}
+    }
+    rowIdx++;
+    if(i%2===1){ctx.fillStyle='#f5f9ff';ctx.fillRect(x0,y,x1-x0,rh);}
+    ctx.strokeStyle='#ebebeb';ctx.lineWidth=0.4;
+    ctx.beginPath();ctx.moveTo(x0,y+rh);ctx.lineTo(x1,y+rh);ctx.stroke();
+    var vs={
+      day:isNewDay?toOrdFa(Number(dd)):'',
+      num:String(rowIdx),
+      name:r.name||'—',
+      price:Number(r.price||0).toLocaleString('en'),
+      profit:Number(r.profit||0).toLocaleString('en')
+    };
+    cols.forEach(c=>{
+      ctx.fillStyle=c.k==='profit'?'#1e8449':c.k==='price'?'#1a5276':c.k==='day'?'#154360':'#222';
+      if(c.k==='day')ctx.font=isNewDay?'bold 10px Tahoma,Arial,sans-serif':'11px Tahoma,Arial,sans-serif';
+      else ctx.font='11px Tahoma,Arial,sans-serif';
+      ctx.textAlign=c.a==='right'?'right':'center';
+      ctx.fillText(vs[c.k],c.a==='right'?c.r-5:(c.l+c.r)/2,y+rh/2);
+    });
+    y+=rh;
+  });
+  // جمع کل ماه
+  ctx.fillStyle='#1a5276';ctx.fillRect(x0,y,x1-x0,rh+2);
+  ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma,Arial,sans-serif';ctx.textAlign='right';
+  ctx.fillText('جمع کل ماه '+mName,cols[2].r-5,y+(rh+2)/2);
+  ctx.textAlign='center';
+  ctx.fillText(monP.toLocaleString('en'),(cols[3].l+cols[3].r)/2,y+(rh+2)/2);
+  ctx.fillText(monS.toLocaleString('en'),(cols[4].l+cols[4].r)/2,y+(rh+2)/2);
+  y+=rh+2+20;
+  // کارت‌های خلاصه ماه
+  var cw=(x1-x0-16)/2;
+  ctx.strokeStyle='#154360';ctx.lineWidth=1.5;ctx.strokeRect(x0,y,cw,46);
+  ctx.fillStyle='#666';ctx.font='11px Tahoma,Arial,sans-serif';ctx.textAlign='center';
+  ctx.fillText('مجموع قیمت ماه',x0+cw/2,y+14);
+  ctx.fillStyle='#154360';ctx.font='bold 15px Tahoma,Arial,sans-serif';ctx.fillText(monP.toLocaleString('en'),x0+cw/2,y+33);
+  var x2=x0+cw+16;
+  ctx.strokeStyle='#1e8449';ctx.strokeRect(x2,y,cw,46);
+  ctx.fillStyle='#666';ctx.font='11px Tahoma,Arial,sans-serif';ctx.fillText('مجموع سود ماه',x2+cw/2,y+14);
+  ctx.fillStyle='#1e8449';ctx.font='bold 15px Tahoma,Arial,sans-serif';ctx.fillText(monS.toLocaleString('en'),x2+cw/2,y+33);
+  return cv;
+}
+
+// ── PREVIEW ──
+var _exportCanvas=null,_previewLabel='';
+function openDayPreview(date,rows){
+  if(!rows||rows.length===0){alert('این روز هیچ رکوردی ندارد.');return;}
+  var dm=Number(date.split('/')[0]),dd=Number(date.split('/')[1]);
+  _previewLabel=MN[dm-1]+'_'+dd;
+  document.getElementById('previewTitle').textContent='📄 گزارش روز '+toOrdFa(dd)+' '+MN[dm-1];
+  _exportCanvas=buildDayCanvas(date,rows);
+  showCanvas(_exportCanvas);
+  document.getElementById('filenameInput').value='forosh_'+MN[dm-1]+'_'+dd;
+  document.getElementById('previewModal').classList.add('show');
+}
+function openMonthPreview(mon,datesInMonth,groups){
+  _previewLabel='mahaneh_'+MN[Number(mon)-1];
+  document.getElementById('previewTitle').textContent='📊 گزارش ماه '+MN[Number(mon)-1];
+  _exportCanvas=buildMonthCanvas(mon,datesInMonth,groups);
+  showCanvas(_exportCanvas);
+  document.getElementById('filenameInput').value='mahaneh_'+MN[Number(mon)-1]+'_'+toFa(currentYear);
+  document.getElementById('previewModal').classList.add('show');
+}
+function showCanvas(cv){
+  var pv=document.getElementById('previewCanvas');
+  pv.width=cv.width;pv.height=cv.height;
+  pv.getContext('2d').drawImage(cv,0,0);
+}
+function closePreview(){document.getElementById('previewModal').classList.remove('show');}
+function getFilename(){return(document.getElementById('filenameInput').value.trim()||'forosh').replace(/[\\/:*?"<>|]/g,'_');}
+
+// ── PDF ──
+function canvasToPdfBlob(cv){
+  var du=cv.toDataURL('image/jpeg',0.92),b64=du.split(',')[1];
+  var bs=atob(b64),len=bs.length,jb=new Uint8Array(len);
+  for(var i=0;i<len;i++)jb[i]=bs.charCodeAt(i);
+  var parts=[],offset=0,offs=[0];
+  function pS(s){var b=new TextEncoder().encode(s);parts.push(b);offset+=b.length;}
+  function pB(b){parts.push(b);offset+=b.length;}
+  var pw=595,ph=Math.round(cv.height/cv.width*595);
+  pS('%PDF-1.4\n');offs[1]=offset;pS('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  offs[2]=offset;pS('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+  offs[3]=offset;pS('3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /XObject << /Im0 5 0 R >> >> /MediaBox [0 0 '+pw+' '+ph+'] /Contents 4 0 R >>\nendobj\n');
+  var cs='q '+pw+' 0 0 '+ph+' 0 0 cm /Im0 Do Q';
+  offs[4]=offset;pS('4 0 obj\n<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream\nendobj\n');
+  offs[5]=offset;pS('5 0 obj\n<< /Type /XObject /Subtype /Image /Width '+cv.width+' /Height '+cv.height+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+jb.length+' >>\nstream\n');
+  pB(jb);pS('\nendstream\nendobj\n');
+  var xs=offset,xr='xref\n0 6\n0000000000 65535 f \n';
+  for(var n=1;n<=5;n++)xr+=String(offs[n]).padStart(10,'0')+' 00000 n \n';
+  pS(xr);pS('trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n'+xs+'\n%%EOF');
+  var tot=parts.reduce((s,p)=>s+p.length,0),out=new Uint8Array(tot),pos=0;
+  parts.forEach(p=>{out.set(p,pos);pos+=p.length;});
   return new Blob([out],{type:'application/pdf'});
 }
 
-function downloadBlob(blob, filename){
-  // گرفتن تاییدیه و اسم دلخواه از کاربر قبل از دانلود در موبایل
-  var userFileName = prompt("لطفاً نام فایل PDF را به دلخواه وارد کنید:", filename);
-  if (userFileName === null) return; // اگر انصراف داد
-  if (userFileName.trim() === "") { userFileName = filename; }
-  if (!userFileName.endsWith(".pdf")) { userFileName += ".pdf"; }
-
+function downloadBlobAs(blob,filename){
+  if(window.showSaveFilePicker){
+    var ext=filename.split('.').pop();
+    var mt={pdf:'application/pdf',jpg:'image/jpeg',json:'application/json'};
+    window.showSaveFilePicker({suggestedName:filename,types:[{description:'File',accept:{[mt[ext]||'application/octet-stream']:['.'+(ext||'bin')]}}]})
+    .then(h=>h.createWritable()).then(w=>w.write(blob).then(()=>w.close()))
+    .catch(e=>{if(e.name!=='AbortError')fallbackDL(blob,filename);});
+  }else{fallbackDL(blob,filename);}
+}
+function fallbackDL(blob,filename){
   var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url; a.download=userFileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  var a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+function doSavePDF(){if(!_exportCanvas)return;downloadBlobAs(canvasToPdfBlob(_exportCanvas),getFilename()+'.pdf');closePreview();}
+function doSaveJPG(){if(!_exportCanvas)return;_exportCanvas.toBlob(b=>{downloadBlobAs(b,getFilename()+'.jpg');closePreview();},'image/jpeg',0.92);}
+function doShare(){
+  if(!_exportCanvas)return;
+  var fname=getFilename();
+  _exportCanvas.toBlob(function(blob){
+    var file=new File([blob],fname+'.jpg',{type:'image/jpeg'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({title:'دفتر فروش',files:[file]}).catch(()=>{});
+    }else if(navigator.share){
+      navigator.share({title:'دفتر فروش',text:_previewLabel}).catch(()=>{});
+    }else{fallbackDL(blob,fname+'.jpg');alert('اشتراک‌گذاری پشتیبانی نمی‌شود. فایل JPG ذخیره شد.');}
+  },'image/jpeg',0.92);
 }
 
-function exportDayPDF(btn, date, rows){
-  if(btn){ btn.disabled=true; var oldTxt=btn.textContent; btn.textContent='⏳'; }
-  try{
-    var sp=date.split('/'); var dm=sp[0], dd=sp[1];
-    var monthName=monthNamesDari[Number(dm)-1];
-    var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
-    var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
-
-    var scale=2;
-    var pageWpt=595, marginPt=28, rowHpt=26, headerHpt=58, theadHpt=28, footerHpt=70;
-    var contentHpt=headerHpt+theadHpt+rows.length*rowHpt+footerHpt+marginPt*2;
-    var pageHpt=Math.max(contentHpt,260);
-
-    var canvas=document.createElement('canvas');
-    canvas.width=Math.round(pageWpt*scale);
-    canvas.height=Math.round(pageHpt*scale);
-    var ctx=canvas.getContext('2d');
-    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.scale(scale,scale);
-    ctx.textBaseline='middle';
-
-    var x0=marginPt, x1=pageWpt-marginPt;
-    var y=marginPt;
-
-    ctx.fillStyle='#1a5276';
-    ctx.font='bold 18px Tahoma, Arial, sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('دفتر فروش روزانه', pageWpt/2, y+10);
-    y+=24;
-    ctx.fillStyle='#666';
-    ctx.font='12px Tahoma, Arial, sans-serif';
-    ctx.fillText('تاریخ: '+dm+' '+monthName+' - روز '+dd, pageWpt/2, y+8);
-    y+=28;
-
-    var numW=28, priceW=85, profitW=85;
-    var nameW=(x1-x0)-numW-priceW-profitW;
-    var cols=[
-      {key:'num', w:numW, align:'center'},
-      {key:'name', w:nameW, align:'right'},
-      {key:'price', w:priceW, align:'center'},
-      {key:'profit', w:profitW, align:'center'}
-    ];
-    var right=x1;
-    cols.forEach(function(c){ c.right=right; c.left=right-c.w; right=c.left; });
-
-    ctx.fillStyle='#1a5276';
-    ctx.fillRect(x0,y,x1-x0,theadHpt);
-    ctx.fillStyle='#ffffff';
-    ctx.font='bold 12px Tahoma, Arial, sans-serif';
-    var labels={num:'#',name:'اسم جنس',price:'قیمت',profit:'سود'};
-    cols.forEach(function(c){
-      ctx.textAlign=c.align==='right'?'right':'center';
-      var tx=c.align==='right'?c.right-6:(c.left+c.right)/2;
-      ctx.fillText(labels[c.key], tx, y+theadHpt/2);
-    });
-    y+=theadHpt;
-
-    ctx.font='12px Tahoma, Arial, sans-serif';
-    rows.forEach(function(r,i){
-      if(i%2===1){ ctx.fillStyle='#f0f8ff'; ctx.fillRect(x0,y,x1-x0,rowHpt); }
-      ctx.strokeStyle='#ddd'; ctx.lineWidth=0.5;
-      ctx.beginPath(); ctx.moveTo(x0,y+rowHpt); ctx.lineTo(x1,y+rowHpt); ctx.stroke();
-      ctx.fillStyle='#222';
-      var vals={num:String(i+1), name:r.name||'—', price:Number(r.price||0).toLocaleString('en'), profit:Number(r.profit||0).toLocaleString('en')};
-      cols.forEach(function(c){
-        ctx.textAlign=c.align==='right'?'right':'center';
-        var tx=c.align==='right'?c.right-6:(c.left+c.right)/2;
-        ctx.fillText(vals[c.key], tx, y+rowHpt/2);
-      });
-      y+=rowHpt;
-    });
-
-    ctx.fillStyle='#d6eaf8';
-    ctx.fillRect(x0,y,x1-x0,rowHpt);
-    ctx.fillStyle='#1a3a5c';
-    ctx.font='bold 12px Tahoma, Arial, sans-serif';
-    ctx.textAlign='right'; ctx.fillText('جمع کل', cols[1].right-6, y+rowHpt/2);
-    ctx.textAlign='center';
-    ctx.fillText(dayP.toLocaleString('en'), (cols[2].left+cols[2].right)/2, y+rowHpt/2);
-    ctx.fillText(dayS.toLocaleString('en'), (cols[3].left+cols[3].right)/2, y+rowHpt/2);
-    y+=rowHpt+24;
-
-    var cardW=(x1-x0-16)/2;
-    ctx.strokeStyle='#1a5276'; ctx.lineWidth=1.5;
-    ctx.strokeRect(x0,y,cardW,46);
-    ctx.fillStyle='#555'; ctx.font='11px Tahoma, Arial, sans-serif'; ctx.textAlign='center';
-    ctx.fillText('مجموع قیمت', x0+cardW/2, y+15);
-    ctx.fillStyle='#1a5276'; ctx.font='bold 16px Tahoma, Arial, sans-serif';
-    ctx.fillText(dayP.toLocaleString('en'), x0+cardW/2, y+33);
-
-    var x2=x0+cardW+16;
-    ctx.strokeStyle='#1e8449';
-    ctx.strokeRect(x2,y,cardW,46);
-    ctx.fillStyle='#555'; ctx.font='11px Tahoma, Arial, sans-serif';
-    ctx.fillText('مجموع سود', x2+cardW/2, y+15);
-    ctx.fillStyle='#1e8449'; ctx.font='bold 16px Tahoma, Arial, sans-serif';
-    ctx.fillText(dayS.toLocaleString('en'), x2+cardW/2, y+33);
-
-    var blob=buildPdfFromCanvas(canvas, pageWpt, pageHpt);
-    downloadBlob(blob, 'forosh_'+dm+'_'+dd);
-  }catch(err){
-    console.error(err);
-    alert('خطا در ساخت PDF: '+(err&&err.message?err.message:err));
-  }finally{
-    if(btn){ btn.disabled=false; btn.textContent=oldTxt; }
-  }
-}
-
+// ── RENDER ──
 function render(){
-  var groups={}, order=[];
+  var groups={},order=[];
   records.forEach(function(r){
-    if(!groups[r.date]){ groups[r.date]=[]; order.push(r.date); }
+    if(!groups[r.date]){groups[r.date]=[];order.push(r.date);}
     groups[r.date].push(r);
   });
-  order=[...new Set(order)];
-  order.sort(function(a,b){
-    var [am,ad]=a.split('/').map(Number);
-    var [bm,bd]=b.split('/').map(Number);
+  order=[...new Set(order)].sort(function(a,b){
+    var am=Number(a.split('/')[0]),ad=Number(a.split('/')[1]);
+    var bm=Number(b.split('/')[0]),bd=Number(b.split('/')[1]);
     return am!==bm?am-bm:ad-bd;
+  });
+
+  var months={},monthOrder=[];
+  order.forEach(function(date){
+    var m=date.split('/')[0];
+    if(!months[m]){months[m]=[];monthOrder.push(m);}
+    months[m].push(date);
   });
 
   var wrap=document.getElementById('tableWrap');
   wrap.innerHTML='';
   var totalP=0,totalS=0;
 
-  order.forEach(function(date){
-    var rows=groups[date];
-    var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
-    var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
-    totalP+=dayP; totalS+=dayS;
+  monthOrder.forEach(function(mon){
+    var mName=MN[Number(mon)-1],monP=0,monS=0;
+    months[mon].forEach(date=>groups[date].forEach(r=>{monP+=Number(r.price||0);monS+=Number(r.profit||0);}));
+    totalP+=monP;totalS+=monS;
 
-    var [dm,dd]=date.split('/');
-    var mName=monthNamesDari[Number(dm)-1];
+    var mBlock=document.createElement('div');
+    mBlock.className='month-block';
+    
+    var mh=document.createElement('div');mh.className='month-header';
+    mh.innerHTML='<span>📆 ماه '+mName+'</span>'+
+      '<div class="mh-btns">'+
+      '<span style="font-size:11px;opacity:.8">'+months[mon].length+' روز</span>'+
+      '<button class="month-pdf-btn" id="mbtn_'+mon+'">📊 گزارش ماه</button>'+
+      '</div>';
+    mBlock.appendChild(mh);
+    
+    var ms=document.createElement('div');ms.className='month-summary';
+    ms.innerHTML='<span>💰 جمع قیمت: '+fmtN(monP)+'</span><span>📈 جمع سود: '+fmtN(monS)+'</span>';
+    mBlock.appendChild(ms);
 
-    var block=document.createElement('div');
-    block.className='day-block';
-    block.innerHTML=`
-      <div class="day-header">
-        <span>📅 ${toFa(dm)} ${mName} / ${toFa(dd)}</span>
-        <div class="hdr-btns">
-          <span class="day-totals">ق: ${formatNum(dayP)} | س: ${formatNum(dayS)}</span>
-          <button class="pdf-btn" onclick="exportDayPDF(this, '${date}', window._groups['${date}'])">📄 PDF</button>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th class="name-col">اسم جنس</th>
-            <th>قیمت</th>
-            <th>سود</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody_${date.replace('/','_')}"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="2" style="text-align:right;padding-right:8px;color:#555;font-size:12px">جمع</td>
-            <td class="price-cell">${formatNum(dayP)}</td>
-            <td class="profit-cell">${formatNum(dayS)}</td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
-    `;
-    wrap.appendChild(block);
+    months[mon].forEach(function(date){
+      var rows=groups[date];
+      var dayP=rows.reduce((s,r)=>s+Number(r.price||0),0);
+      var dayS=rows.reduce((s,r)=>s+Number(r.profit||0),0);
+      var dm=Number(date.split('/')[0]),dd=Number(date.split('/')[1]);
+      var wdName=jalaliWeekDay(currentYear,dm,dd);
 
-    var tbody=document.getElementById('tbody_'+date.replace('/','_'));
-    rows.forEach(function(r,i){
-      var tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td style="color:#aaa;font-size:11px">${toFa(i+1)}</td>
-        <td class="name-cell">${r.name||'—'}</td>
-        <td class="price-cell">${formatNum(r.price)}</td>
-        <td class="profit-cell">${formatNum(r.profit)}</td>
-        <td><button class="del-btn" onclick="deleteRow(${r.id})">🗑</button></td>
-      `;
-      tbody.appendChild(tr);
+      var db=document.createElement('div');db.className='day-block';
+      db.innerHTML=
+        '<div class="day-header">'+
+          '<span>'+wdName+' '+toOrdFa(dd)+' '+mName+'</span>'+
+          '<div class="hdr-btns">'+
+            '<span class="day-totals">ق: '+fmtN(dayP)+' | س: '+fmtN(dayS)+'</span>'+
+            '<button class="pdf-btn" id="dbtn_'+date.replace('/','_')+'">👁 پیش‌نمایش</button>'+
+          '</div>'+
+        '</div>'+
+        '<table><thead><tr><th>#</th><th class="name-col">اسم جنس</th>'+
+        '<th>قیمت</th><th>سود</th><th></th></tr></thead>'+
+        '<tbody></tbody>'+
+        '<tfoot><tr><td colspan="2" style="text-align:right;padding-right:8px;color:#555;font-size:12px">جمع</td>'+
+        '<td class="price-cell">'+fmtN(dayP)+'</td>'+
+        '<td class="profit-cell">'+fmtN(dayS)+'</td><td></td></tr></tfoot></table>';
+      mBlock.appendChild(db);
+
+      var tbody=db.querySelector('tbody');
+      rows.forEach(function(r,i){
+        var row=document.createElement('tr');
+        row.innerHTML=
+          '<td style="color:#aaa;font-size:11px">'+toFa(i+1)+'</td>'+
+          '<td class="name-cell">'+esc(r.name)+'</td>'+
+          '<td class="price-cell">'+fmtN(r.price)+'</td>'+
+          '<td class="profit-cell">'+fmtN(r.profit)+'</td>'+
+          '<td><button class="del-btn" title="ویرایش/حذف">✏️</button></td>';
+        
+        // اصلاح باگ: اتصال مستقیم رویداد کلیک بدون نیاز به گرفتن المان از کل صفحه
+        row.querySelector('.del-btn').onclick=function(){
+          showRowActions(r.id);
+        };
+        tbody.appendChild(row);
+      });
     });
+
+    wrap.appendChild(mBlock);
+
+    // اتصال رویداد پیش‌نمایش روز
+    months[mon].forEach(function(date){
+      var btnId='dbtn_'+date.replace('/','_');
+      var btn=document.getElementById(btnId);
+      if(btn)(function(d){btn.onclick=function(){openDayPreview(d,groups[d]);};})(date);
+    });
+    // اتصال رویداد گزارش ماه
+    (function(m,arr,g){
+      var btn=document.getElementById('mbtn_'+m);
+      if(btn)btn.onclick=function(){openMonthPreview(m,arr,g);};
+    })(mon,months[mon],groups);
   });
 
-  window._groups=groups;
+  window._g=groups;
 
   if(order.length===0){
     wrap.innerHTML='<div class="empty-msg">هنوز رکوردی ثبت نشده<br>اولین فروش امروز را وارد کنید ✍️</div>';
   }
 
   var todayRows=groups[currentDate]||[];
-  var tp=todayRows.reduce((s,r)=>s+Number(r.price||0),0);
-  var ts=todayRows.reduce((s,r)=>s+Number(r.profit||0),0);
-  document.getElementById('todayPrice').textContent=formatNum(tp);
-  document.getElementById('todayProfit').textContent=formatNum(ts);
-  document.getElementById('totalPrice').textContent=formatNum(totalP);
-  document.getElementById('totalProfit').textContent=formatNum(totalS);
+  document.getElementById('todayPrice').textContent=fmtN(todayRows.reduce((s,r)=>s+Number(r.price||0),0));
+  document.getElementById('todayProfit').textContent=fmtN(todayRows.reduce((s,r)=>s+Number(r.profit||0),0));
+  document.getElementById('totalPrice').textContent=fmtN(totalP);
+  document.getElementById('totalProfit').textContent=fmtN(totalS);
 }
 
-document.addEventListener('keydown',function(e){ if(e.key==='Enter') addRow(); });
+// ── ROW ACTIONS (ویرایش یا حذف) ──
+function closeRowActions(){document.getElementById('rowActionsModal').classList.remove('show');}
+function showRowActions(id){
+  var r=records.find(x=>x.id===id);
+  if(!r)return;
+  document.getElementById('rowActionsTitle').textContent='عملیات';
+  document.getElementById('rowActionsDesc').textContent='جنس: '+r.name+' | قیمت: '+r.price+' | سود: '+r.profit;
+  document.getElementById('rowEditBtn').onclick=function(){closeRowActions();openEdit(id);};
+  document.getElementById('rowDeleteBtn').onclick=function(){
+    closeRowActions();
+    showConfirm('حذف ردیف','آیا "'+r.name+'" حذف شود؟',function(){
+      records=records.filter(x=>x.id!==id);save();render();
+    });
+  };
+  document.getElementById('rowActionsModal').classList.add('show');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter')addRow();});
 initSelectors();
 </script>
 </body>
