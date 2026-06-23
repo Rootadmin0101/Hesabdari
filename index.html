@@ -22,7 +22,7 @@ header p{font-size:11px;opacity:.75;margin-top:2px;}
 .card .value{font-size:15px;font-weight:bold;}
 .card.price .value{color:#1a5276;}
 .card.profit .value{color:#1e8449;}
-.table-wrap{padding:0 8px 100px;}
+.table-wrap{padding:0 8px 10px;}
 .month-block{margin-top:16px;}
 .month-header{background:#154360;color:white;border-radius:10px 10px 0 0;padding:8px 14px;font-size:13px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;}
 .month-header .mh-btns{display:flex;gap:6px;align-items:center;}
@@ -32,7 +32,6 @@ header p{font-size:11px;opacity:.75;margin-top:2px;}
 .day-block{background:white;border-bottom:1px solid #e8f0f8;}
 .day-block:last-child{border-radius:0 0 10px 10px;border-bottom:none;box-shadow:0 2px 5px rgba(0,0,0,.08);}
 .day-header{background:#2e86c1;color:white;padding:6px 12px;font-size:12px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;gap:6px;}
-.day-totals{font-size:11px;opacity:.85;}
 .hdr-btns{display:flex;gap:5px;align-items:center;}
 .pdf-btn{background:#e8f5e9;color:#1e8449;border:1px solid #a5d6a7;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;white-space:nowrap;}
 .pdf-btn:active{background:#c8e6c9;}
@@ -46,12 +45,12 @@ tbody tr:last-child td{border-bottom:none;}
 .price-cell{color:#1a5276;}
 .del-btn{background:none;border:none;color:#1a5276;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;}
 tfoot td{padding:6px 4px;background:#eaf2f8;font-weight:bold;text-align:center;}
-.grand-total{margin:14px 8px;background:#1a5276;color:white;border-radius:12px;padding:12px 16px;display:flex;justify-content:space-around;text-align:center;}
-.gt-item .gt-label{font-size:11px;opacity:.8;}
-.gt-item .gt-val{font-size:19px;font-weight:bold;margin-top:2px;}
-.bottom-btns{margin:0 8px 10px;display:flex;gap:8px;}
-.backup-btn{flex:1;background:#fff;color:#1a5276;border:1.5px solid #1a5276;border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
-.restore-btn{flex:1;background:#fff;color:#7d6608;border:1.5px solid #d4ac0d;border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
+
+/* حاشیه 85 پیکسلی از پایین باعث می‌شود دکمه‌ها زیر فرم مخفی نشوند */
+.bottom-btns{margin:20px 8px 85px; display:flex; gap:8px;}
+.backup-btn{flex:1;background:#fff;color:#1a5276;border:1.5px solid #1a5276;border-radius:8px;padding:10px;font-size:14px;font-weight:bold;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
+.restore-btn{flex:1;background:#fff;color:#7d6608;border:1.5px solid #d4ac0d;border-radius:8px;padding:10px;font-size:14px;font-weight:bold;cursor:pointer;font-family:Tahoma,Arial,sans-serif;}
+
 .add-form{position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #1a5276;padding:8px 10px;display:flex;gap:6px;align-items:center;z-index:200;box-shadow:0 -2px 10px rgba(0,0,0,.15);}
 .add-form input{flex:1;border:1px solid #bcd;border-radius:8px;padding:9px 6px;font-size:14px;font-family:Tahoma,Arial,sans-serif;text-align:center;background:#f7fbff;min-width:0;}
 .add-form input#inName{flex:1.6;text-align:right;padding-right:8px;}
@@ -59,6 +58,7 @@ tfoot td{padding:6px 4px;background:#eaf2f8;font-weight:bold;text-align:center;}
 .add-btn{background:#1a5276;color:white;border:none;border-radius:8px;padding:9px 14px;font-size:20px;cursor:pointer;flex-shrink:0;}
 .add-btn:active{background:#154360;}
 .empty-msg{text-align:center;color:#aaa;padding:30px;font-size:14px;}
+
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;}
 .modal-overlay.show{display:flex;}
@@ -78,6 +78,7 @@ tfoot td{padding:6px 4px;background:#eaf2f8;font-weight:bold;text-align:center;}
 .filename-row label{font-size:12px;color:#555;}
 .filename-row input{border:1px solid #bcd;border-radius:8px;padding:8px 10px;font-size:13px;font-family:Tahoma,Arial,sans-serif;width:100%;}
 #backupModal p{font-size:13px;color:#555;line-height:1.7;margin-bottom:8px;text-align:center;}
+
 /* EDIT MODAL */
 .edit-field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
 .edit-field label{font-size:12px;color:#555;}
@@ -111,14 +112,12 @@ tfoot td{padding:6px 4px;background:#eaf2f8;font-weight:bold;text-align:center;}
   <div class="card profit"><div class="label">سود روز انتخابی</div><div class="value" id="todayProfit">۰</div></div>
 </div>
 <div class="table-wrap" id="tableWrap"></div>
-<div class="grand-total">
-  <div class="gt-item"><div class="gt-label">مجموع کل قیمت</div><div class="gt-val" id="totalPrice">۰</div></div>
-  <div class="gt-item"><div class="gt-label">مجموع کل سود</div><div class="gt-val" id="totalProfit">۰</div></div>
-</div>
+
 <div class="bottom-btns">
-  <button class="backup-btn" onclick="openBackupModal()">💾 بک‌آپ</button>
-  <button class="restore-btn" onclick="triggerRestore()">📂 بازیابی</button>
+  <button class="backup-btn" onclick="openBackupModal()">💾 بک‌آپ اطلاعات</button>
+  <button class="restore-btn" onclick="triggerRestore()">📂 بازیابی اطلاعات</button>
 </div>
+
 <div class="add-form">
   <input type="text" id="inName" placeholder="اسم جنس">
   <input type="number" id="inPrice" placeholder="قیمت" inputmode="numeric">
@@ -360,7 +359,6 @@ function buildDayCanvas(date,rows){
   ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
   ctx.scale(sc,sc);ctx.textBaseline='middle';
   var x0=mg,x1=pw-mg;
-  // هدر
   ctx.fillStyle='#1a5276';ctx.fillRect(0,0,pw,hh);
   ctx.fillStyle='#fff';ctx.font='bold 17px Tahoma,Arial,sans-serif';ctx.textAlign='center';
   ctx.fillText('دفتر فروش روزانه',pw/2,22);
@@ -369,17 +367,14 @@ function buildDayCanvas(date,rows){
   ctx.font='11px Tahoma,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.6)';
   ctx.fillText('گزارش فروش روزانه',pw/2,68);
   var y=hh+14;
-  // ستون‌ها
   var nW=26,pW=95,sW=95,nmW=(x1-x0)-nW-pW-sW;
   var cols=[{k:'num',w:nW,a:'center'},{k:'name',w:nmW,a:'right'},{k:'price',w:pW,a:'center'},{k:'profit',w:sW,a:'center'}];
   var rt=x1;cols.forEach(c=>{c.r=rt;c.l=rt-c.w;rt=c.l;});
-  // thead
   ctx.fillStyle='#2e86c1';ctx.fillRect(x0,y,x1-x0,th);
   ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma,Arial,sans-serif';
   var lb={num:'#',name:'اسم جنس',price:'قیمت',profit:'سود'};
   cols.forEach(c=>{ctx.textAlign=c.a==='right'?'right':'center';ctx.fillText(lb[c.k],c.a==='right'?c.r-6:(c.l+c.r)/2,y+th/2);});
   y+=th;
-  // ردیف‌ها
   ctx.font='12px Tahoma,Arial,sans-serif';
   rows.forEach((r,i)=>{
     if(i%2===1){ctx.fillStyle='#f0f8ff';ctx.fillRect(x0,y,x1-x0,rh);}
@@ -392,7 +387,6 @@ function buildDayCanvas(date,rows){
       ctx.fillText(vs[c.k],c.a==='right'?c.r-6:(c.l+c.r)/2,y+rh/2);
     });y+=rh;
   });
-  // جمع
   ctx.fillStyle='#d6eaf8';ctx.fillRect(x0,y,x1-x0,rh);
   ctx.font='bold 12px Tahoma,Arial,sans-serif';
   ctx.fillStyle='#1a3a5c';ctx.textAlign='right';ctx.fillText('جمع کل',cols[1].r-6,y+rh/2);
@@ -400,7 +394,6 @@ function buildDayCanvas(date,rows){
   ctx.fillStyle='#1a5276';ctx.fillText(dayP.toLocaleString('en'),(cols[2].l+cols[2].r)/2,y+rh/2);
   ctx.fillStyle='#1e8449';ctx.fillText(dayS.toLocaleString('en'),(cols[3].l+cols[3].r)/2,y+rh/2);
   y+=rh+18;
-  // کارت‌ها
   var cw=(x1-x0-16)/2;
   ctx.strokeStyle='#1a5276';ctx.lineWidth=1.5;ctx.strokeRect(x0,y,cw,46);
   ctx.fillStyle='#666';ctx.font='11px Tahoma,Arial,sans-serif';ctx.textAlign='center';
@@ -428,7 +421,6 @@ function buildMonthCanvas(mon,datesInMonth,groups){
   ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
   ctx.scale(sc,sc);ctx.textBaseline='middle';
   var x0=mg,x1=pw-mg;
-  // هدر
   ctx.fillStyle='#154360';ctx.fillRect(0,0,pw,hh);
   ctx.fillStyle='#fff';ctx.font='bold 17px Tahoma,Arial,sans-serif';ctx.textAlign='center';
   ctx.fillText('گزارش ماهانه فروش',pw/2,22);
@@ -437,17 +429,14 @@ function buildMonthCanvas(mon,datesInMonth,groups){
   ctx.font='11px Tahoma,Arial,sans-serif';ctx.fillStyle='rgba(255,255,255,.6)';
   ctx.fillText(datesInMonth.length+' روز کاری | '+allRows.length+' قلم فروش',pw/2,70);
   var y=hh+14;
-  // ستون‌ها (اضافه: روز)
   var dW=55,nW=24,pW=85,sW=85,nmW=(x1-x0)-dW-nW-pW-sW;
   var cols=[{k:'day',w:dW,a:'center'},{k:'num',w:nW,a:'center'},{k:'name',w:nmW,a:'right'},{k:'price',w:pW,a:'center'},{k:'profit',w:sW,a:'center'}];
   var rt=x1;cols.forEach(c=>{c.r=rt;c.l=rt-c.w;rt=c.l;});
-  // thead
   ctx.fillStyle='#1a5276';ctx.fillRect(x0,y,x1-x0,th);
   ctx.fillStyle='#fff';ctx.font='bold 11px Tahoma,Arial,sans-serif';
   var lb={day:'روز',num:'#',name:'اسم جنس',price:'قیمت',profit:'سود'};
   cols.forEach(c=>{ctx.textAlign=c.a==='right'?'right':'center';ctx.fillText(lb[c.k],c.a==='right'?c.r-5:(c.l+c.r)/2,y+th/2);});
   y+=th;
-  // ردیف‌ها با گروه‌بندی روز
   ctx.font='11px Tahoma,Arial,sans-serif';
   var prevDate='',rowIdx=0;
   allRows.forEach((r,i)=>{
@@ -455,7 +444,6 @@ function buildMonthCanvas(mon,datesInMonth,groups){
     var isNewDay=r._date!==prevDate;
     if(isNewDay){
       rowIdx=0;prevDate=r._date;
-      // خط جداکننده روز
       if(i>0){ctx.strokeStyle='#b0c4d8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();}
     }
     rowIdx++;
@@ -478,7 +466,6 @@ function buildMonthCanvas(mon,datesInMonth,groups){
     });
     y+=rh;
   });
-  // جمع کل ماه
   ctx.fillStyle='#1a5276';ctx.fillRect(x0,y,x1-x0,rh+2);
   ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma,Arial,sans-serif';ctx.textAlign='right';
   ctx.fillText('جمع کل ماه '+mName,cols[2].r-5,y+(rh+2)/2);
@@ -486,7 +473,6 @@ function buildMonthCanvas(mon,datesInMonth,groups){
   ctx.fillText(monP.toLocaleString('en'),(cols[3].l+cols[3].r)/2,y+(rh+2)/2);
   ctx.fillText(monS.toLocaleString('en'),(cols[4].l+cols[4].r)/2,y+(rh+2)/2);
   y+=rh+2+20;
-  // کارت‌های خلاصه ماه
   var cw=(x1-x0-16)/2;
   ctx.strokeStyle='#154360';ctx.lineWidth=1.5;ctx.strokeRect(x0,y,cw,46);
   ctx.fillStyle='#666';ctx.font='11px Tahoma,Arial,sans-serif';ctx.textAlign='center';
@@ -637,7 +623,7 @@ function render(){
         '<div class="day-header">'+
           '<span>'+wdName+' '+toOrdFa(dd)+' '+mName+'</span>'+
           '<div class="hdr-btns">'+
-            '<span class="day-totals">ق: '+fmtN(dayP)+' | س: '+fmtN(dayS)+'</span>'+
+            // نوشته تکراری جمع کل از هدر پاک شد
             '<button class="pdf-btn" id="dbtn_'+date.replace('/','_')+'">👁 پیش‌نمایش</button>'+
           '</div>'+
         '</div>'+
@@ -659,7 +645,6 @@ function render(){
           '<td class="profit-cell">'+fmtN(r.profit)+'</td>'+
           '<td><button class="del-btn" title="ویرایش/حذف">✏️</button></td>';
         
-        // اصلاح باگ: اتصال مستقیم رویداد کلیک بدون نیاز به گرفتن المان از کل صفحه
         row.querySelector('.del-btn').onclick=function(){
           showRowActions(r.id);
         };
@@ -669,13 +654,11 @@ function render(){
 
     wrap.appendChild(mBlock);
 
-    // اتصال رویداد پیش‌نمایش روز
     months[mon].forEach(function(date){
       var btnId='dbtn_'+date.replace('/','_');
       var btn=document.getElementById(btnId);
       if(btn)(function(d){btn.onclick=function(){openDayPreview(d,groups[d]);};})(date);
     });
-    // اتصال رویداد گزارش ماه
     (function(m,arr,g){
       var btn=document.getElementById('mbtn_'+m);
       if(btn)btn.onclick=function(){openMonthPreview(m,arr,g);};
@@ -691,8 +674,7 @@ function render(){
   var todayRows=groups[currentDate]||[];
   document.getElementById('todayPrice').textContent=fmtN(todayRows.reduce((s,r)=>s+Number(r.price||0),0));
   document.getElementById('todayProfit').textContent=fmtN(todayRows.reduce((s,r)=>s+Number(r.profit||0),0));
-  document.getElementById('totalPrice').textContent=fmtN(totalP);
-  document.getElementById('totalProfit').textContent=fmtN(totalS);
+  // کدهای مربوط به مجموع کل از اینجا حذف شد
 }
 
 // ── ROW ACTIONS (ویرایش یا حذف) ──
